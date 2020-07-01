@@ -1,2 +1,2 @@
-# broadcaster-asyncapi
-Publish events using broadcaster from asyncapi specification
+# doodle
+Publish events using broadcaster lib from asyncapi specification

@@ -1,0 +1,3 @@
+[submodule "devtools"]
+	path = devtools
+	url = git@github.com:dutradda/devtools.git

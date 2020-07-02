@@ -2,11 +2,11 @@ include devtools/python/Bakefile devtools/common/Bakefile
 
 export MYPYPATH=./stubs
 export PYTHONPATH=.
-export PROJECT_NAME=doodle
+export PROJECT_NAME=asyncapi
 
 deploy: //check-virtualenv @confirm:secure deploy-docs release-pypi push-release
 
-setup-doodle: //check-virtualenv
+setup-asyncapi: //check-virtualenv
     pip install --force-reinstall git+https://github.com/pycqa/pyflakes
 
 integration: check-code tests-code coverage

@@ -1,11 +1,11 @@
 import pytest
 
-import doodle
+import asyncapi
 
 
 @pytest.fixture
 def expected_spec():
-    message = doodle.Message(
+    message = asyncapi.Message(
         name='Fake Message',
         title='Faked',
         summary='Faked message',
@@ -15,28 +15,28 @@ def expected_spec():
             'properties': {'fake': {'type': 'boolean'}},
         },
     )
-    return doodle.Specification(
-        info=doodle.Info(
+    return asyncapi.Specification(
+        info=asyncapi.Info(
             title='Fake API', version='0.0.1', description='Faked API',
         ),
         servers=[
-            doodle.Server(
+            asyncapi.Server(
                 name='production',
                 url='fake.fake',
-                protocol=doodle.ProtocolType.KAFKA,
+                protocol=asyncapi.ProtocolType.KAFKA,
                 description='Fake Server',
             )
         ],
         channels=[
-            doodle.Channel(
+            asyncapi.Channel(
                 name='fake',
                 description='Fake Channel',
-                subscribe=doodle.Subscribe(
-                    message, operation_id='doodle._tests.fake_operation'
+                subscribe=asyncapi.Subscribe(
+                    message, operation_id='asyncapi._tests.fake_operation'
                 ),
             )
         ],
-        components=doodle.Components(
+        components=asyncapi.Components(
             messages={'FakeMessage': message},
             schemas={'FakePayload': message.payload},
         ),
@@ -44,4 +44,4 @@ def expected_spec():
 
 
 def test_should_build_spec(spec_dict, expected_spec):
-    assert doodle.build_spec(spec_dict) == expected_spec
+    assert asyncapi.build_spec(spec_dict) == expected_spec

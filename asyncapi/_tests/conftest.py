@@ -20,7 +20,7 @@ def spec_dict():
             'fake': {
                 'description': 'Fake Channel',
                 'subscribe': {
-                    'operationId': 'doodle._tests.fake_operation',
+                    'operationId': 'asyncapi._tests.fake_operation',
                     'message': {'$ref': '#/components/messages/FakeMessage'},
                 },
             }

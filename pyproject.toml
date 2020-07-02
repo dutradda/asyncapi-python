@@ -3,10 +3,10 @@ requires = ['flit']
 build-backend = 'flit.buildapi'
 
 [tool.flit.metadata]
-module = 'doodle'
+module = 'asyncapi'
 author = 'Diogo Dutra'
 author-email = 'diogodutradamata@gmail.com'
-home-page = 'https://github.com/dutradda/doodle'
+home-page = 'https://github.com/dutradda/asyncapi'
 classifiers = [
     'License :: OSI Approved :: MIT License',
     'Intended Audience :: Developers',
@@ -23,7 +23,7 @@ description-file = 'README.md'
 requires-python = '>=3.7'
 
 [tool.flit.metadata.urls]
-Documentation = 'https://dutradda.github.io/doodle/'
+Documentation = 'https://dutradda.github.io/asyncapi/'
 
 [tool.flit.metadata.requires-extra]
 test = [
@@ -49,10 +49,10 @@ http = [
 
 [tool.flit.sdist]
 exclude = [
-    "doodle/conftest.py",
-    "doodle/_tests",
-    "doodle/*/_tests",
-    "doodle/*/*/_tests",
+    "asyncapi/conftest.py",
+    "asyncapi/_tests",
+    "asyncapi/*/_tests",
+    "asyncapi/*/*/_tests",
     "Makefile",
     "Bakefile",
     "devtools",

@@ -1,6 +1,6 @@
 import pytest
 
-import doodle
+import asyncapi
 
 
 @pytest.fixture
@@ -12,11 +12,11 @@ def test_should_get_dict_from_ref(spec):
     ref = '#/fake1/fake2/fake3'
     expected = {'faked': True}
 
-    assert doodle.dict_from_ref(ref, spec) == expected
+    assert asyncapi.dict_from_ref(ref, spec) == expected
 
 
 def test_should_not_get_dict_from_ref(spec):
     ref = '#/fake1/fake3'
 
-    with pytest.raises(doodle.ReferenceNotFoundError):
-        doodle.dict_from_ref(ref, spec)
+    with pytest.raises(asyncapi.ReferenceNotFoundError):
+        asyncapi.dict_from_ref(ref, spec)

@@ -1,6 +1,6 @@
 import dataclasses
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 
 @dataclasses.dataclass
@@ -55,21 +55,7 @@ class Components:
 @dataclasses.dataclass
 class Specification:
     info: Info
-    servers: List[Server]
-    channels: List[Channel]
+    servers: Dict[str, Server]
+    channels: Dict[str, Channel]
     components: Optional[Components] = None
     default_content_type: Optional[str] = None
-
-
-OperationsTypeHint = Dict[str, Dict[str, Callable[..., Any]]]
-
-
-@dataclasses.dataclass
-class AsyncApi:
-    spec: Specification
-    operations: OperationsTypeHint
-
-    def __getattr__(self, attr_name: str, default_value: Any = None) -> Any:
-        return self.operations.get(attr_name) or super().__getattr__(  # type: ignore
-            attr_name, default_value
-        )

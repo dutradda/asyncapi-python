@@ -20,7 +20,7 @@ def spec_dict():
             'fake': {
                 'description': 'Fake Channel',
                 'subscribe': {
-                    'operationId': 'asyncapi._tests.fake_operation',
+                    'operationId': 'fake_operation',
                     'message': {'$ref': '#/components/messages/FakeMessage'},
                 },
             }
@@ -38,8 +38,33 @@ def spec_dict():
             'schemas': {
                 'FakePayload': {
                     'type': 'object',
-                    'properties': {'fake': {'type': 'boolean'}},
+                    'properties': {'faked': {'type': 'boolean'}},
                 }
             },
         },
     }
+
+
+@pytest.fixture
+def async_iterator(mocker):
+    return AsyncIterator
+
+
+class AsyncIterator:
+    def __init__(self, seq):
+        self.iter = iter(seq)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            return next(self.iter)
+        except StopIteration:
+            raise StopAsyncIteration
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        ...

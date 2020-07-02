@@ -17,7 +17,7 @@ classifiers = [
 requires = [
     'circuitbreaker',
     'cachetools',
-    'pyyaml',
+    'broadcaster',
 ]
 description-file = 'README.md'
 requires-python = '>=3.7'
@@ -37,6 +37,8 @@ test = [
     'pytest',
     'flake8',
     'bumpversion',
+    'jsonschema',
+    'asynctest',
 ]
 doc = [
     'mkdocs',
@@ -45,6 +47,18 @@ doc = [
 ]
 http = [
     'httpx',
+]
+yaml = [
+    'pyyaml',
+]
+kafka = [
+    'broadcaster[kafka]',
+]
+redis = [
+    'broadcaster[redis]',
+]
+postgres = [
+    'broadcaster[postgres]',
 ]
 
 [tool.flit.sdist]

@@ -12,30 +12,30 @@ def expected_spec():
         content_type='application/json',
         payload={
             'type': 'object',
-            'properties': {'fake': {'type': 'boolean'}},
+            'properties': {'faked': {'type': 'boolean'}},
         },
     )
     return asyncapi.Specification(
         info=asyncapi.Info(
             title='Fake API', version='0.0.1', description='Faked API',
         ),
-        servers=[
-            asyncapi.Server(
+        servers={
+            'production': asyncapi.Server(
                 name='production',
                 url='fake.fake',
                 protocol=asyncapi.ProtocolType.KAFKA,
                 description='Fake Server',
             )
-        ],
-        channels=[
-            asyncapi.Channel(
+        },
+        channels={
+            'fake': asyncapi.Channel(
                 name='fake',
                 description='Fake Channel',
                 subscribe=asyncapi.Subscribe(
-                    message, operation_id='asyncapi._tests.fake_operation'
+                    message, operation_id='fake_operation'
                 ),
             )
-        ],
+        },
         components=asyncapi.Components(
             messages={'FakeMessage': message},
             schemas={'FakePayload': message.payload},

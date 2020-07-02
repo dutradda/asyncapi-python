@@ -10,14 +10,14 @@ from collections import deque
 from typing import Any, Dict, Optional
 
 import yaml
+from broadcaster import Broadcast
 
+from .api import AsyncApi, OperationsTypeHint
 from .entities import (
-    AsyncApi,
     Channel,
     Components,
     Info,
     Message,
-    OperationsTypeHint,
     ProtocolType,
     Server,
     Specification,
@@ -26,25 +26,31 @@ from .entities import (
 from .exceptions import ReferenceNotFoundError
 
 
-def api(path: str) -> AsyncApi:
+def api(
+    path: str, server: str = 'production', operations_module: str = ''
+) -> AsyncApi:
     spec = build_spec(load_spec_dict(path))
-    operations = build_channel_operations(spec)
-    return AsyncApi(spec, operations)
+    operations = build_channel_operations(spec, operations_module)
+    protocol = spec.servers[server].protocol.value
+    url = spec.servers[server].url
+    broadcast = Broadcast(f'{protocol}://{url}')
+    return AsyncApi(spec, operations, broadcast)
 
 
-def build_channel_operations(spec: Specification) -> OperationsTypeHint:
-    operations: OperationsTypeHint = {}
-
-    for channel in spec.channels:
-        if channel.subscribe.operation_id:
-            mod_parts = channel.subscribe.operation_id.split('.')
-            op_name = mod_parts[-1]
-            mod_name = '.'.join(mod_parts[:-1])
-            operations[op_name] = getattr(
-                importlib.import_module(mod_name), op_name
+def build_channel_operations(
+    spec: Specification, operations_module: str
+) -> OperationsTypeHint:
+    if operations_module:
+        return {
+            (channel_name, channel.subscribe.operation_id): getattr(
+                importlib.import_module(operations_module),
+                channel.subscribe.operation_id,
             )
+            for channel_name, channel in spec.channels.items()
+            if channel.subscribe.operation_id
+        }
 
-    return operations
+    return {}
 
 
 def load_spec_dict(path: str) -> Dict[str, Any]:
@@ -57,16 +63,16 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
 
     return Specification(
         info=Info(**spec['info']),
-        servers=[
-            Server(
+        servers={
+            server_name: Server(
                 name=server_name,
                 protocol=ProtocolType(server_spec.pop('protocol')),
                 **server_spec,
             )
             for server_name, server_spec in spec['servers'].items()
-        ],
-        channels=[
-            Channel(
+        },
+        channels={
+            channel_name: Channel(
                 name=channel_name,
                 subscribe=Subscribe(
                     message=Message(**channel_spec['subscribe']['message']),
@@ -77,7 +83,7 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
                 **channel_spec,
             )
             for channel_name, channel_spec in spec['channels'].items()
-        ],
+        },
         components=Components(
             messages={
                 msg_id: Message(**message)

@@ -1,0 +1,11 @@
+[run]
+source =
+    doodle
+omit =
+    */test_*.py
+    *conftest.py
+    *venv*
+    doodle/__init__.py
+
+[report]
+show_missing = True

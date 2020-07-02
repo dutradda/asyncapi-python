@@ -36,6 +36,7 @@ test = [
     'pytest-mock',
     'pytest',
     'flake8',
+    'bumpversion',
 ]
 doc = [
     'mkdocs',

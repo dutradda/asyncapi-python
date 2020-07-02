@@ -31,7 +31,7 @@ def spec_dict():
                     'name': 'Fake Message',
                     'title': 'Faked',
                     'summary': 'Faked message',
-                    'content_type': 'application/json',
+                    'contentType': 'application/json',
                     'payload': {'$ref': '#/components/schemas/FakePayload'},
                 }
             },

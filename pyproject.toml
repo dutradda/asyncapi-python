@@ -46,7 +46,7 @@ doc = [
     'markdown-include'
 ]
 http = [
-    'httpx',
+    'requests',
 ]
 yaml = [
     'pyyaml',

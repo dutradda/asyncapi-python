@@ -1,14 +1,16 @@
 """
-Doodle
+asyncapi
 """
 
 __version__ = '0.1.0'
 
 
 import importlib
+import io
 from collections import deque
 from typing import Any, Dict, Optional
 
+import requests
 import yaml
 from broadcaster import Broadcast
 
@@ -54,7 +56,20 @@ def build_channel_operations(
 
 
 def load_spec_dict(path: str) -> Dict[str, Any]:
-    spec: Dict[str, Any] = yaml.safe_load(open(path))
+    spec: Dict[str, Any]
+
+    if path.startswith('http'):
+        request = requests.get(path)
+        request.raise_for_status()
+
+        if path.endswith('.json'):
+            spec = request.json()
+        else:
+            spec = yaml.safe_load(io.BytesIO(request.content))
+
+    else:
+        spec = yaml.safe_load(open(path))
+
     return spec
 
 
@@ -75,7 +90,18 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
             channel_name: Channel(
                 name=channel_name,
                 subscribe=Subscribe(
-                    message=Message(**channel_spec['subscribe']['message']),
+                    message=Message(
+                        content_type=channel_spec['subscribe']['message'].get(
+                            'contentType', spec.get('defaultContentType')
+                        ),
+                        **{
+                            k: v
+                            for k, v in channel_spec['subscribe'][
+                                'message'
+                            ].items()
+                            if k != 'contentType'
+                        },
+                    ),
                     operation_id=channel_spec.pop('subscribe').get(
                         'operationId', None
                     ),
@@ -86,7 +112,12 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
         },
         components=Components(
             messages={
-                msg_id: Message(**message)
+                msg_id: Message(
+                    content_type=message.get(
+                        'contentType', spec.get('defaultContentType')
+                    ),
+                    **{k: v for k, v in message.items() if k != 'contentType'},
+                )
                 for msg_id, message in spec['components']['messages'].items()
             }
             if 'messages' in spec['components']

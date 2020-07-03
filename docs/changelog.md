@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Support load subscriber as script
+
 ### 0.3.0 - 2020-07-03
 
  - Create subscriber cli

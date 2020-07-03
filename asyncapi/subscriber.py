@@ -106,3 +106,7 @@ def fork_server() -> None:
             pid = os.fork()
             if pid == 0:
                 break
+
+
+if __name__ == '__main__':
+    run()  # pragma: no cover

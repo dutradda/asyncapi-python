@@ -1,4 +1,7 @@
+import asynctest
 import pytest
+
+import asyncapi.builder
 
 
 @pytest.fixture
@@ -10,7 +13,7 @@ def spec_dict():
             'description': 'Faked API',
         },
         'servers': {
-            'production': {
+            'development': {
                 'url': 'fake.fake',
                 'protocol': 'kafka',
                 'description': 'Fake Server',
@@ -43,6 +46,35 @@ def spec_dict():
             },
         },
     }
+
+
+@pytest.fixture(autouse=True)
+def fake_yaml(mocker, spec_dict):
+    yaml = mocker.patch.object(asyncapi.builder, 'yaml')
+    mocker.patch('asyncapi.builder.open')
+    yaml.safe_load.return_value = spec_dict
+    return yaml
+
+
+@pytest.fixture(autouse=True)
+def fake_broadcast(message, mocker, async_iterator):
+    broadcast = mocker.patch.object(asyncapi.builder, 'Broadcast').return_value
+    broadcast.publish = asynctest.CoroutineMock()
+    broadcast.connect = asynctest.CoroutineMock()
+    broadcast.subscribe.return_value = async_iterator(
+        [mocker.MagicMock(message=message)]
+    )
+    return broadcast
+
+
+@pytest.fixture
+def message():
+    return {'faked': True}
+
+
+@pytest.fixture
+def invalid_message():
+    return {'faked': 'invalid'}
 
 
 @pytest.fixture

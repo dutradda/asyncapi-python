@@ -2,52 +2,23 @@ import asynctest
 import pytest
 from jsonschema import ValidationError
 
-import asyncapi
 import asyncapi.exceptions
-
-
-@pytest.fixture(autouse=True)
-def fake_yaml(mocker, spec_dict):
-    yaml = mocker.patch.object(asyncapi, 'yaml')
-    mocker.patch('asyncapi.open')
-    yaml.safe_load.return_value = spec_dict
-    return yaml
-
-
-@pytest.fixture(autouse=True)
-def fake_broadcast(message, mocker, async_iterator):
-    broadcast = mocker.patch.object(asyncapi, 'Broadcast').return_value
-    broadcast.publish = asynctest.CoroutineMock()
-    broadcast.subscribe.return_value = async_iterator(
-        [mocker.MagicMock(message=message)]
-    )
-    return broadcast
-
-
-@pytest.fixture
-def message():
-    return {'faked': True}
-
-
-@pytest.fixture
-def invalid_message():
-    return {'faked': 'invalid'}
 
 
 @pytest.fixture
 def fake_api():
-    return asyncapi.api('fake', operations_module='asyncapi._tests')
+    return asyncapi.build_api('fake', operations_module='asyncapi._tests')
 
 
 @pytest.fixture
-def fake_api_no_operation(fake_yaml, spec_dict):
-    return asyncapi.api('fake')
+def fake_api_no_operation(spec_dict):
+    return asyncapi.build_api('fake')
 
 
 @pytest.fixture
-def fake_api_no_operation_id(fake_yaml, spec_dict):
+def fake_api_no_operation_id(spec_dict):
     spec_dict['channels']['fake']['subscribe'].pop('operationId')
-    return asyncapi.api('fake')
+    return asyncapi.build_api('fake')
 
 
 def test_should_get_api(fake_api):

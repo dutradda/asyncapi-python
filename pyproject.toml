@@ -60,6 +60,9 @@ redis = [
 postgres = [
     'broadcaster[postgres]',
 ]
+subscriber = [
+    'typer',
+]
 
 [tool.flit.sdist]
 exclude = [
@@ -81,6 +84,9 @@ exclude = [
     ".gitmodules",
     ".flake8",
 ]
+
+[tool.flit.scripts]
+asyncapi-subscriber = "asyncapi:run_subscriber"
 
 [tool.isort]
 case_sensitive= '1'

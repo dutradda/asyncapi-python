@@ -16,3 +16,11 @@ class OperationIdNotFoundError(AsyncApiError):
 
 class ChannelOperationNotFoundError(AsyncApiError):
     ...
+
+
+class UrlRequiredError(AsyncApiError):
+    ...
+
+
+class ChannelRequiredError(AsyncApiError):
+    ...

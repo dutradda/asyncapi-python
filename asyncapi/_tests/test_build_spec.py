@@ -20,8 +20,8 @@ def expected_spec():
             title='Fake API', version='0.0.1', description='Faked API',
         ),
         servers={
-            'production': asyncapi.Server(
-                name='production',
+            'development': asyncapi.Server(
+                name='development',
                 url='fake.fake',
                 protocol=asyncapi.ProtocolType.KAFKA,
                 description='Fake Server',

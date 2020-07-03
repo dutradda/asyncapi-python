@@ -21,6 +21,7 @@ class AsyncApi:
     spec: Specification
     operations: OperationsTypeHint
     broadcast: Broadcast
+    republish_error_messages: bool = True
 
     async def publish(self, channel_id: str, message: Dict[str, Any]) -> None:
         self.validate_message(channel_id, message)
@@ -45,11 +46,18 @@ class AsyncApi:
                     coro = self.operations[(channel_id, operation_id)](
                         event.message
                     )
+
+                    if asyncio.iscoroutine(coro):
+                        await coro
+
                 except KeyError:
                     raise OperationIdNotFoundError(operation_id)
 
-                if asyncio.iscoroutine(coro):
-                    await coro
+                except Exception:
+                    if not self.republish_error_messages:
+                        raise
+
+                    await self.publish(channel_id, event.message)
 
     def validate_message(
         self, channel_id: str, message: Dict[str, Any]

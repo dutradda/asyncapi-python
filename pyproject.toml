@@ -15,9 +15,8 @@ classifiers = [
     'Topic :: Database',
 ]
 requires = [
-    'circuitbreaker',
-    'cachetools',
     'broadcaster',
+    'jsonschema',
 ]
 description-file = 'README.md'
 requires-python = '>=3.7'
@@ -52,13 +51,13 @@ yaml = [
     'pyyaml',
 ]
 kafka = [
-    'broadcaster[kafka]',
+    'aiokafka',
 ]
 redis = [
-    'broadcaster[redis]',
+    'asyncio-redis',
 ]
 postgres = [
-    'broadcaster[postgres]',
+    'asyncpg',
 ]
 subscriber = [
     'typer',

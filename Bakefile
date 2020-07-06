@@ -4,6 +4,14 @@ export MYPYPATH=./stubs
 export PYTHONPATH=.
 export PROJECT_NAME=asyncapi
 
+//build-docs:
+    mkdocs build
+    cp docs/changelog.md CHANGELOG.md
+    cp docs/contributing.md CONTRIBUTING.md
+    cd docs
+    ../devtools/common/replace-placeholders.py index.md ../README.md
+    sed -i -r "s/${PROJECT_NAME}-python-white.svg/${PROJECT_NAME}-python.svg/g" ../README.md
+
 deploy: //check-virtualenv @confirm:secure deploy-docs release-pypi push-release
 
 setup-asyncapi: //check-virtualenv

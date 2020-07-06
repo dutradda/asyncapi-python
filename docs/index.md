@@ -2,7 +2,7 @@
 
 <p align="center" style="margin: 3em">
   <a href="https://github.com/dutradda/asyncapi-python">
-    <img src="asyncapi-python-white.svg" alt="asyncapi-python" width="300"/>
+    <img src="https://dutradda.github.io/asyncapi-python/asyncapi-python-white.svg" alt="asyncapi-python" width="300"/>
   </a>
 </p>
 

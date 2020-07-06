@@ -1,0 +1,32 @@
+site_name: Python AsyncAPI
+site_description: |
+  Python library for translate asyncapi specification to python code,
+  without code generation.
+
+theme:
+    name: material
+    custom_dir: theme
+    palette:
+      primary: deep-purple
+      accent: grey
+    logo: asyncapi-python-white.svg
+    favicon: asyncapi-python.svg
+
+repo_name: dutradda/asyncapi-python
+repo_url: https://github.com/dutradda/asyncapi-python
+edit_uri: ''
+
+nav:
+    - Home: index.md
+    - Development - Contributing: contributing.md
+    - Changelog: changelog.md
+
+markdown_extensions:
+    - markdown_include.include:
+        base_path: docs
+    - codehilite:
+        guess_lang: false
+
+extra_css:
+  - stylesheets/dark_theme.css
+  - stylesheets/codehilite.css

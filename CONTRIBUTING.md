@@ -1,7 +1,7 @@
 ## Starting Development
 
 ```bash
-git clone git@github.com:dutradda/asyncapi.git --recursive
+git clone git@github.com:dutradda/asyncapi-python.git --recursive
 cd asyncapi
 make setup-python-virtualenv
 source venv/bin/activate

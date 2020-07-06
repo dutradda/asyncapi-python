@@ -28,12 +28,12 @@ def test_should_get_api(fake_api):
 
 @pytest.mark.asyncio
 async def test_should_publish_message(
-    fake_api, fake_broadcast, message, mocker
+    fake_api, fake_broadcast, message, mocker, json_message
 ):
     await fake_api.publish('fake', message)
 
     assert fake_broadcast.publish.call_args_list == [
-        mocker.call(channel='fake', message=message)
+        mocker.call(channel='fake', message=json_message)
     ]
 
 
@@ -73,12 +73,17 @@ async def test_should_not_publish_for_invalid_channel(
 
 @pytest.mark.asyncio
 async def test_should_not_listen_for_invalid_message(
-    fake_api, fake_broadcast, invalid_message, mocker, async_iterator
+    fake_api,
+    fake_broadcast,
+    invalid_message,
+    mocker,
+    async_iterator,
+    json_invalid_message,
 ):
     fake_operation = asynctest.CoroutineMock()
     fake_api.operations[('fake', 'fake_operation')] = fake_operation
     fake_broadcast.subscribe.return_value = async_iterator(
-        [mocker.MagicMock(message=invalid_message)]
+        [mocker.MagicMock(message=json_invalid_message)]
     )
 
     with pytest.raises(ValidationError) as exc_info:

@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Fix api publish and listen methods
+
 ### 0.3.1 - 2020-07-03
 
  - Support load subscriber as script

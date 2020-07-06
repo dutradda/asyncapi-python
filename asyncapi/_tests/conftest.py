@@ -1,3 +1,5 @@
+import json
+
 import asynctest
 import pytest
 
@@ -57,12 +59,12 @@ def fake_yaml(mocker, spec_dict):
 
 
 @pytest.fixture(autouse=True)
-def fake_broadcast(message, mocker, async_iterator):
+def fake_broadcast(json_message, mocker, async_iterator):
     broadcast = mocker.patch.object(asyncapi.builder, 'Broadcast').return_value
     broadcast.publish = asynctest.CoroutineMock()
     broadcast.connect = asynctest.CoroutineMock()
     broadcast.subscribe.return_value = async_iterator(
-        [mocker.MagicMock(message=message)]
+        [mocker.MagicMock(message=json_message)]
     )
     return broadcast
 
@@ -73,8 +75,18 @@ def message():
 
 
 @pytest.fixture
+def json_message():
+    return json.dumps({'faked': True})
+
+
+@pytest.fixture
 def invalid_message():
     return {'faked': 'invalid'}
+
+
+@pytest.fixture
+def json_invalid_message():
+    return json.dumps({'faked': 'invalid'})
 
 
 @pytest.fixture

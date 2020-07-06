@@ -21,12 +21,12 @@ def test_should_get_api(fake_api):
 
 @pytest.mark.asyncio
 async def test_should_publish_message(
-    fake_api, fake_broadcast, message, mocker
+    fake_api, fake_broadcast, message, mocker, json_message
 ):
     await fake_api.publish('fake', message)
 
     assert fake_broadcast.publish.call_args_list == [
-        mocker.call(channel='fake', message=message)
+        mocker.call(channel='fake', message=json_message)
     ]
 
 

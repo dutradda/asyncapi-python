@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.4.0 - 2020-07-06
 
  - Create docs
 

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.5.0 - 2020-07-07
 
  - Refactor api
 

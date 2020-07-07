@@ -2,10 +2,10 @@
 
 import asyncio
 
-from asyncapi import build_api
+from asyncapi import build_api_auto_spec
 
 
-api = build_api('api-spec.yaml')
+api = build_api_auto_spec('user_events')
 channel_id = 'user/update'
 message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 

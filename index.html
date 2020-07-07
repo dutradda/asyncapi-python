@@ -303,6 +303,18 @@ without code generation.
 
 
   <li class="md-nav__item">
+    <a href="auto-spec/" title="Declaring Specification" class="md-nav__link">
+      Declaring Specification
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="contributing/" title="Development - Contributing" class="md-nav__link">
       Development - Contributing
     </a>
@@ -447,9 +459,9 @@ without code generation.
 </ul>
 <h2 id="requirements">Requirements</h2>
 <ul>
-<li>Python 3.7+</li>
+<li>Python 3.8+</li>
 <li>broadcaster</li>
-<li>jsonschema</li>
+<li>jsondaora</li>
 <li>requests (Optional for http specification)</li>
 <li>typer (Optional for subscriber application)</li>
 <li>
@@ -512,19 +524,20 @@ without code generation.
 
 
 <h2 id="creating-subscribers-module">Creating subscribers module</h2>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># user_events.py</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 
 <span class="k">async</span> <span class="k">def</span> <span class="nf">receive_user_update</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received update for user id=</span><span class="si">{</span><span class="n">message</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received update for user id=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
 <h2 id="start-subscriber-to-listen-events">Start subscriber to listen events</h2>
 <div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber <span class="se">\</span>
     --url api-spec.yaml <span class="se">\</span>
-    --channel user/update <span class="se">\</span>
-    --operations-module user_events
+    --api-module user_events
 </code></pre></div>
 
 
@@ -533,26 +546,26 @@ without code generation.
 
 
 <h2 id="publishing-updates">Publishing Updates</h2>
-<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># publish.py</span>
+
+<span class="kn">import</span> <span class="nn">asyncio</span>
 
 <span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">build_api</span>
 
 
-<span class="n">spec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s1">&#39;api-spec.yaml&#39;</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">api</span> <span class="o">=</span> <span class="n">build_api</span><span class="p">(</span><span class="s1">&#39;api-spec.yaml&#39;</span><span class="p">)</span>
+<span class="n">channel_id</span> <span class="o">=</span> <span class="s1">&#39;user/update&#39;</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">payload</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;fake-user&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Fake User&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">build_api</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
-<span class="n">message</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;fake-user&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Fake User&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span>
-<span class="p">}</span>
 
-<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s1">&#39;user/update&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Published update for user=</span><span class="si">{</span><span class="n">message</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Published update for user=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -583,13 +596,13 @@ Received update for user id=fake-user
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
         
-          <a href="contributing/" title="Development - Contributing" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="auto-spec/" title="Declaring Specification" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Development - Contributing
+                Declaring Specification
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

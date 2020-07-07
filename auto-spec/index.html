@@ -19,7 +19,7 @@ without code generation.
     
     
       
-        <title>Development - Contributing - Python AsyncAPI</title>
+        <title>Declaring Specification - Python AsyncAPI</title>
       
     
     
@@ -74,7 +74,7 @@ without code generation.
     <div data-md-component="skip">
       
         
-        <a href="#starting-development" class="md-skip">
+        <a href="#declaring-specification-with-python-code" class="md-skip">
           Skip to content
         </a>
       
@@ -101,7 +101,7 @@ without code generation.
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              Development - Contributing
+              Declaring Specification
             
           </span>
         </div>
@@ -210,18 +210,6 @@ without code generation.
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../auto-spec/" title="Declaring Specification" class="md-nav__link">
-      Declaring Specification
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -229,21 +217,25 @@ without code generation.
     
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
+      
+    
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Development - Contributing
+        Declaring Specification
         <span class="md-nav__icon md-icon">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
         </span>
       </label>
     
-    <a href="./" title="Development - Contributing" class="md-nav__link md-nav__link--active">
-      Development - Contributing
+    <a href="./" title="Declaring Specification" class="md-nav__link md-nav__link--active">
+      Declaring Specification
     </a>
     
       
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -255,22 +247,29 @@ without code generation.
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#starting-development" class="md-nav__link">
-    Starting Development
+  <a href="#creating-subscribers-module" class="md-nav__link">
+    Creating subscribers module
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-the-integration-suite" class="md-nav__link">
-    Running the integration suite:
+  <a href="#start-subscriber-to-listen-events" class="md-nav__link">
+    Start subscriber to listen events
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#other-bake-tasks" class="md-nav__link">
-    Other bake tasks:
+  <a href="#publishing-updates" class="md-nav__link">
+    Publishing Updates
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#receive-updates" class="md-nav__link">
+    Receive Updates
   </a>
   
 </li>
@@ -279,6 +278,18 @@ without code generation.
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../contributing/" title="Development - Contributing" class="md-nav__link">
+      Development - Contributing
+    </a>
   </li>
 
     
@@ -308,6 +319,8 @@ without code generation.
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon">
@@ -318,22 +331,29 @@ without code generation.
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#starting-development" class="md-nav__link">
-    Starting Development
+  <a href="#creating-subscribers-module" class="md-nav__link">
+    Creating subscribers module
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-the-integration-suite" class="md-nav__link">
-    Running the integration suite:
+  <a href="#start-subscriber-to-listen-events" class="md-nav__link">
+    Start subscriber to listen events
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#other-bake-tasks" class="md-nav__link">
-    Other bake tasks:
+  <a href="#publishing-updates" class="md-nav__link">
+    Publishing Updates
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#receive-updates" class="md-nav__link">
+    Receive Updates
   </a>
   
 </li>
@@ -354,36 +374,73 @@ without code generation.
                   
                 
                 
-                  <h1>Development - Contributing</h1>
-                
-                <h2 id="starting-development">Starting Development</h2>
-<div class="codehilite"><pre><span></span><code>git clone git@github.com:dutradda/asyncapi-python.git --recursive
-<span class="nb">cd</span> asyncapi
-make setup-python-virtualenv
-<span class="nb">source</span> venv/bin/activate
-make setup-python-project
-bake setup-asyncapi
-bake dependencies
+                <h1 id="declaring-specification-with-python-code">Declaring Specification with Python Code</h1>
+<h2 id="creating-subscribers-module">Creating subscribers module</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># user_events.py</span>
+
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">Spec</span>
+
+
+<span class="n">spec</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">(</span><span class="s1">&#39;User Events&#39;</span><span class="p">,</span> <span class="n">development</span><span class="o">=</span><span class="s1">&#39;redis://localhost&#39;</span><span class="p">)</span>
+
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">UserUpdateMessage</span><span class="p">:</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="nd">@spec</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">channel_name</span><span class="o">=</span><span class="s1">&#39;user/update&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">receive_user_update</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">UserUpdateMessage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received update for user id=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
-<h2 id="running-the-integration-suite">Running the integration suite:</h2>
-<div class="codehilite"><pre><span></span><code>bake integration
+<h2 id="start-subscriber-to-listen-events">Start subscriber to listen events</h2>
+<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber --api-module user_events
 </code></pre></div>
 
 
-<h2 id="other-bake-tasks">Other bake tasks:</h2>
-<div class="codehilite"><pre><span></span><code>bake check-code
-
-bake tests-docs
-
-bake serve-docs
-
-bake add-changelog <span class="nv">m</span><span class="o">=</span><span class="s2">&quot;Add my cool feature&quot;</span>
+<div class="codehilite"><pre><span></span><code>Waiting messages...
 </code></pre></div>
 
 
-<p>You can run <code>bake</code> to see all tasks available.</p>
+<h2 id="publishing-updates">Publishing Updates</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># publish.py</span>
+
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">build_api_auto_spec</span>
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">build_api_auto_spec</span><span class="p">(</span><span class="s1">&#39;user_events&#39;</span><span class="p">)</span>
+<span class="n">channel_id</span> <span class="o">=</span> <span class="s1">&#39;user/update&#39;</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">payload</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;fake-user&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Fake User&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Published update for user=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>Published update for user=fake-user
+</code></pre></div>
+
+
+<h2 id="receive-updates">Receive Updates</h2>
+<div class="codehilite"><pre><span></span><code>Waiting messages...
+Received update for user id=fake-user
+</code></pre></div>
                 
               
               
@@ -402,7 +459,7 @@ bake add-changelog <span class="nv">m</span><span class="o">=</span><span class=
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../auto-spec/" title="Declaring Specification" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href=".." title="Home" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -411,19 +468,19 @@ bake add-changelog <span class="nv">m</span><span class="o">=</span><span class=
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Declaring Specification
+                Home
               </div>
             </div>
           </a>
         
         
-          <a href="../changelog/" title="Changelog" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../contributing/" title="Development - Contributing" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Changelog
+                Development - Contributing
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

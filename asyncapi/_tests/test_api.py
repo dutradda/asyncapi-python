@@ -1,13 +1,13 @@
 import asynctest
 import pytest
-from jsonschema import ValidationError
+from jsondaora import DeserializationError
 
 import asyncapi.exceptions
 
 
 @pytest.fixture
 def fake_api():
-    return asyncapi.build_api('fake', operations_module='asyncapi._tests')
+    return asyncapi.build_api('fake', module_name='asyncapi._tests')
 
 
 @pytest.fixture
@@ -28,57 +28,49 @@ def test_should_get_api(fake_api):
 
 @pytest.mark.asyncio
 async def test_should_publish_message(
-    fake_api, fake_broadcast, message, mocker, json_message
+    fake_api, fake_broadcast, fake_message, mocker, json_message
 ):
-    await fake_api.publish('fake', message)
+    await fake_api.publish('fake', fake_message)
 
     assert fake_broadcast.publish.call_args_list == [
-        mocker.call(channel='fake', message=json_message)
+        mocker.call(channel='fake', message=json_message.decode())
     ]
 
 
 @pytest.mark.asyncio
 async def test_should_listen_message(
-    fake_api, fake_broadcast, message, mocker
+    fake_api, fake_broadcast, mocker, fake_message
 ):
     fake_operation = asynctest.CoroutineMock()
     fake_api.operations[('fake', 'fake_operation')] = fake_operation
+
     await fake_api.listen('fake')
 
     assert fake_broadcast.subscribe.call_args_list == [
         mocker.call(channel='fake')
     ]
-    assert fake_operation.call_args_list == [mocker.call(message)]
+    assert fake_operation.call_args_list == [mocker.call(fake_message)]
 
 
 @pytest.mark.asyncio
-async def test_should_not_publish_for_invalid_message(
-    fake_api, invalid_message, mocker
-):
-    with pytest.raises(ValidationError) as exc_info:
-        await fake_api.publish('fake', invalid_message)
+async def test_should_not_publish_for_invalid_message(fake_api, fake_message):
+    with pytest.raises(asyncapi.exceptions.InvalidMessageError) as exc_info:
+        await fake_api.publish('fake', 'invalid')
 
-    assert exc_info.value.instance == invalid_message['faked']
+    assert exc_info.value.args == ('invalid', type(fake_message))
 
 
 @pytest.mark.asyncio
-async def test_should_not_publish_for_invalid_channel(
-    fake_api, message, mocker
-):
+async def test_should_not_publish_for_invalid_channel(fake_api, fake_message):
     with pytest.raises(asyncapi.exceptions.InvalidChannelError) as exc_info:
-        await fake_api.publish('faked', message)
+        await fake_api.publish('faked', fake_message)
 
     assert exc_info.value.args == ('faked',)
 
 
 @pytest.mark.asyncio
 async def test_should_not_listen_for_invalid_message(
-    fake_api,
-    fake_broadcast,
-    invalid_message,
-    mocker,
-    async_iterator,
-    json_invalid_message,
+    fake_api, fake_broadcast, mocker, async_iterator, json_invalid_message,
 ):
     fake_operation = asynctest.CoroutineMock()
     fake_api.operations[('fake', 'fake_operation')] = fake_operation
@@ -86,17 +78,17 @@ async def test_should_not_listen_for_invalid_message(
         [mocker.MagicMock(message=json_invalid_message)]
     )
 
-    with pytest.raises(ValidationError) as exc_info:
+    with pytest.raises(DeserializationError) as exc_info:
         await fake_api.listen('fake')
 
-    assert exc_info.value.instance == invalid_message['faked']
+    assert exc_info.value.args == (
+        'Invalid type=typing.Union[int, NoneType] for field=faked',
+    )
     assert not fake_operation.called
 
 
 @pytest.mark.asyncio
-async def test_should_not_listen_for_invalid_channel(
-    fake_api, message, mocker
-):
+async def test_should_not_listen_for_invalid_channel(fake_api):
     with pytest.raises(asyncapi.exceptions.InvalidChannelError) as exc_info:
         await fake_api.listen('faked')
 
@@ -104,9 +96,7 @@ async def test_should_not_listen_for_invalid_channel(
 
 
 @pytest.mark.asyncio
-async def test_should_not_listen_for_operation_error(
-    fake_api_no_operation, message, mocker
-):
+async def test_should_not_listen_for_operation_error(fake_api_no_operation):
     with pytest.raises(
         asyncapi.exceptions.OperationIdNotFoundError
     ) as exc_info:
@@ -117,7 +107,7 @@ async def test_should_not_listen_for_operation_error(
 
 @pytest.mark.asyncio
 async def test_should_not_listen_for_operation_id_error(
-    fake_api_no_operation_id, message, mocker
+    fake_api_no_operation_id,
 ):
     with pytest.raises(
         asyncapi.exceptions.ChannelOperationNotFoundError

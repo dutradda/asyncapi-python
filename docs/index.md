@@ -30,9 +30,9 @@
 
 ## Requirements
 
- - Python 3.7+
+ - Python 3.8+
  - broadcaster
- - jsonschema
+ - jsondaora
  - requests (Optional for http specification)
  - typer (Optional for subscriber application)
  - pyyaml (Optional for yaml specification)

@@ -1,6 +1,6 @@
 import dataclasses
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Type, get_type_hints
 
 
 @dataclasses.dataclass
@@ -30,7 +30,7 @@ class Message:
     title: str
     summary: str
     content_type: str
-    payload: Any
+    payload: Optional[Type[Any]]
 
 
 @dataclasses.dataclass
@@ -59,3 +59,49 @@ class Specification:
     channels: Dict[str, Channel]
     components: Optional[Components] = None
     default_content_type: Optional[str] = None
+
+
+class Spec(Specification):
+    def __init__(
+        self,
+        title: str,
+        description: str = '',
+        version: str = '1.0.0',
+        **servers: str,
+    ) -> None:
+        self.info = Info(title, version, description)
+        self.servers = {}
+        self.channels = {}
+
+        for server_name, url in servers.items():
+            protocol, uri = url.split('://')
+            self.servers[server_name] = Server(
+                server_name, uri, ProtocolType(protocol), description=''
+            )
+
+    def subscribe(
+        self,
+        *,
+        channel_name: str,
+        channel_description: str = '',
+        message_name: str = '',
+        message_title: str = '',
+        message_summary: str = '',
+    ) -> Callable[..., Callable[..., Any]]:
+        def decorator(subscbriber: Callable[..., Any]) -> Callable[..., Any]:
+            message_type = get_type_hints(subscbriber).get('message')
+            message = Message(
+                name=message_name or channel_name,
+                title=message_title,
+                summary=message_summary,
+                content_type='application/json',
+                payload=message_type,
+            )
+            self.channels[channel_name] = subscbriber.__channel__ = Channel(  # type: ignore
+                channel_name,
+                channel_description,
+                Subscribe(message, subscbriber.__name__),
+            )
+            return subscbriber
+
+        return decorator

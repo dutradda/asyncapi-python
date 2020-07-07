@@ -16,3 +16,8 @@ deploy: //check-virtualenv @confirm:secure deploy-docs release-pypi push-release
 
 setup-asyncapi: //check-virtualenv
     pip install --force-reinstall git+https://github.com/pycqa/pyflakes
+
+coverage: //check-virtualenv
+    coverage combine .coverage.* docs/src/.coverage.*
+    coverage report
+    coverage xml

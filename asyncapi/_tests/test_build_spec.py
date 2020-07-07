@@ -1,19 +1,22 @@
 import pytest
 
 import asyncapi
+import asyncapi.builder
+
+
+@pytest.fixture(autouse=True)
+def fake_jsonschema_asdataclass(mocker):
+    return mocker.patch.object(asyncapi.builder, 'jsonschema_asdataclass')
 
 
 @pytest.fixture
-def expected_spec():
+def expected_spec(fake_jsonschema_asdataclass):
     message = asyncapi.Message(
         name='Fake Message',
         title='Faked',
         summary='Faked message',
         content_type='application/json',
-        payload={
-            'type': 'object',
-            'properties': {'faked': {'type': 'boolean'}},
-        },
+        payload=fake_jsonschema_asdataclass.return_value,
     )
     return asyncapi.Specification(
         info=asyncapi.Info(
@@ -38,7 +41,12 @@ def expected_spec():
         },
         components=asyncapi.Components(
             messages={'FakeMessage': message},
-            schemas={'FakePayload': message.payload},
+            schemas={
+                'FakePayload': {
+                    'type': 'object',
+                    'properties': {'faked': {'type': 'integer'}},
+                }
+            },
         ),
     )
 

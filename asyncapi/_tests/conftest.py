@@ -1,6 +1,5 @@
-import json
-
 import asynctest
+import orjson
 import pytest
 
 import asyncapi.builder
@@ -43,7 +42,7 @@ def spec_dict():
             'schemas': {
                 'FakePayload': {
                     'type': 'object',
-                    'properties': {'faked': {'type': 'boolean'}},
+                    'properties': {'faked': {'type': 'integer'}},
                 }
             },
         },
@@ -70,23 +69,18 @@ def fake_broadcast(json_message, mocker, async_iterator):
 
 
 @pytest.fixture
-def message():
-    return {'faked': True}
+def fake_message(fake_api):
+    return fake_api.spec.channels['fake'].subscribe.message.payload(1)
 
 
 @pytest.fixture
 def json_message():
-    return json.dumps({'faked': True})
-
-
-@pytest.fixture
-def invalid_message():
-    return {'faked': 'invalid'}
+    return orjson.dumps({'faked': 1})
 
 
 @pytest.fixture
 def json_invalid_message():
-    return json.dumps({'faked': 'invalid'})
+    return orjson.dumps({'faked': 'invalid'})
 
 
 @pytest.fixture

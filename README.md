@@ -30,9 +30,9 @@
 
 ## Requirements
 
- - Python 3.7+
+ - Python 3.8+
  - broadcaster
- - jsonschema
+ - jsondaora
  - requests (Optional for http specification)
  - typer (Optional for subscriber application)
  - pyyaml (Optional for yaml specification)
@@ -98,11 +98,13 @@ defaultContentType: application/json
 ## Creating subscribers module
 
 ```python
+# user_events.py
+
 from typing import Any
 
 
 async def receive_user_update(message: Any) -> None:
-    print(f"Received update for user id={message['id']}")
+    print(f"Received update for user id={message.id}")
 
 ```
 
@@ -111,8 +113,7 @@ async def receive_user_update(message: Any) -> None:
 ```bash
 PYTHONPATH=. asyncapi-subscriber \
     --url api-spec.yaml \
-    --channel user/update \
-    --operations-module user_events
+    --api-module user_events
 
 ```
 
@@ -125,26 +126,26 @@ Waiting messages...
 ## Publishing Updates
 
 ```python
+# publish.py
+
 import asyncio
-import os
 
 from asyncapi import build_api
 
 
-spec = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'api-spec.yaml',
-)
+api = build_api('api-spec.yaml')
+channel_id = 'user/update'
+message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 
-api = build_api(spec)
-message = {
-    'id': 'fake-user',
-    'name': 'Fake User',
-    'age': 33,
-}
 
-asyncio.run(api.publish('user/update', message))
+async def publish() -> None:
+    await api.connect()
+    await api.publish(channel_id, message)
 
-print(f"Published update for user={message['id']}")
+
+asyncio.run(publish())
+
+print(f"Published update for user={message.id}")
 
 ```
 

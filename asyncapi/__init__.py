@@ -3,8 +3,6 @@ asyncapi
 """
 
 __version__ = '0.4.0'
-
-
 from .api import AsyncApi, OperationsTypeHint
 from .builder import (
     build_api,
@@ -21,16 +19,16 @@ from .entities import (
     Message,
     ProtocolType,
     Server,
+    Spec,
     Specification,
     Subscribe,
 )
 from .exceptions import (
     ChannelOperationNotFoundError,
-    ChannelRequiredError,
     InvalidChannelError,
     OperationIdNotFoundError,
     ReferenceNotFoundError,
-    UrlRequiredError,
+    UrlOrModuleRequiredError,
 )
 from .subscriber import run as run_subscriber
 
@@ -44,6 +42,7 @@ __all__ = [
     'Server',
     'Specification',
     'Subscribe',
+    'Spec',
     'AsyncApi',
     'OperationsTypeHint',
     'build_api',
@@ -56,7 +55,6 @@ __all__ = [
     'InvalidChannelError',
     'OperationIdNotFoundError',
     'ReferenceNotFoundError',
-    'UrlRequiredError',
-    'ChannelRequiredError',
+    'UrlOrModuleRequiredError',
     'run_subscriber',
 ]

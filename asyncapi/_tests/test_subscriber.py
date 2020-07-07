@@ -1,7 +1,7 @@
 import pytest
 
 import asyncapi.subscriber
-from asyncapi import ChannelRequiredError, UrlRequiredError
+from asyncapi import UrlOrModuleRequiredError
 
 
 @pytest.fixture
@@ -27,11 +27,9 @@ def fake_fork(mocker, autouse=True):
 async def test_should_run_subscriber_for_spec(fake_loop):
     asyncapi.subscriber.main(
         url='fake_url',
-        channel='fake',
         server='development',
-        operations_module='asyncapi._tests',
-        operation_id=None,
-        server_url=None,
+        api_module='asyncapi._tests',
+        channel=None,
     )
     await fake_loop.create_task.call_args_list[0][0][0]
 
@@ -41,23 +39,15 @@ async def test_should_run_subscriber_for_spec(fake_loop):
 @pytest.mark.asyncio
 async def test_should_run_subscriber_for_auto_spec(fake_loop):
     asyncapi.subscriber.main(
-        channel='fake',
-        operations_module='asyncapi._tests',
-        operation_id='fake_operation',
-        server_url='kafka://fake.fake',
+        api_module='asyncapi._tests', channel='fake', url=None, server=None,
     )
     await fake_loop.create_task.call_args_list[0][0][0]
 
     assert fake_loop.run_forever.called
 
 
-def test_should_raise_channel_required_error():
-    with pytest.raises(ChannelRequiredError):
-        asyncapi.subscriber.main(channel=None,)
-
-
-def test_should_raise_url_required_error():
-    with pytest.raises(UrlRequiredError):
+def test_should_raise_url_or_module_required_error():
+    with pytest.raises(UrlOrModuleRequiredError):
         asyncapi.subscriber.main(
-            url=None, channel='fake', server_url=None,
+            url=None, channel='fake', server=None, api_module=None,
         )

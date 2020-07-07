@@ -18,9 +18,13 @@ class ChannelOperationNotFoundError(AsyncApiError):
     ...
 
 
-class UrlRequiredError(AsyncApiError):
+class UrlOrModuleRequiredError(AsyncApiError):
     ...
 
 
-class ChannelRequiredError(AsyncApiError):
+class InvalidJsonSchemaTypeError(AsyncApiError):
+    ...
+
+
+class InvalidMessageError(AsyncApiError):
     ...

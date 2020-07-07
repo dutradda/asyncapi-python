@@ -6,12 +6,7 @@ import asyncapi.exceptions
 
 @pytest.fixture
 def fake_api():
-    return asyncapi.build_api_auto_spec(
-        server_url='kafka://fake.fake',
-        channel='fake',
-        operations_module='asyncapi._tests',
-        operation_id='fake_operation',
-    )
+    return asyncapi.build_api_auto_spec('asyncapi._tests')
 
 
 def test_should_get_api(fake_api):
@@ -21,18 +16,18 @@ def test_should_get_api(fake_api):
 
 @pytest.mark.asyncio
 async def test_should_publish_message(
-    fake_api, fake_broadcast, message, mocker, json_message
+    fake_api, fake_broadcast, fake_message, mocker, json_message
 ):
-    await fake_api.publish('fake', message)
+    await fake_api.publish('fake', fake_message)
 
     assert fake_broadcast.publish.call_args_list == [
-        mocker.call(channel='fake', message=json_message)
+        mocker.call(channel='fake', message=json_message.decode())
     ]
 
 
 @pytest.mark.asyncio
 async def test_should_listen_message(
-    fake_api, fake_broadcast, message, mocker
+    fake_api, fake_broadcast, fake_message, mocker
 ):
     fake_operation = asynctest.CoroutineMock()
     fake_api.operations[('fake', 'fake_operation')] = fake_operation
@@ -41,23 +36,19 @@ async def test_should_listen_message(
     assert fake_broadcast.subscribe.call_args_list == [
         mocker.call(channel='fake')
     ]
-    assert fake_operation.call_args_list == [mocker.call(message)]
+    assert fake_operation.call_args_list == [mocker.call(fake_message)]
 
 
 @pytest.mark.asyncio
-async def test_should_not_publish_for_invalid_channel(
-    fake_api, message, mocker
-):
+async def test_should_not_publish_for_invalid_channel(fake_api, fake_message):
     with pytest.raises(asyncapi.exceptions.InvalidChannelError) as exc_info:
-        await fake_api.publish('faked', message)
+        await fake_api.publish('faked', fake_message)
 
     assert exc_info.value.args == ('faked',)
 
 
 @pytest.mark.asyncio
-async def test_should_not_listen_for_invalid_channel(
-    fake_api, message, mocker
-):
+async def test_should_not_listen_for_invalid_channel(fake_api):
     with pytest.raises(asyncapi.exceptions.InvalidChannelError) as exc_info:
         await fake_api.listen('faked')
 

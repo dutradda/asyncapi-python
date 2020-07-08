@@ -39,7 +39,7 @@ test = [
     'jsondaora',
     'asynctest',
 ]
-doc = [
+dev-doc = [
     'mkdocs',
     'mkdocs-material',
     'markdown-include'
@@ -61,6 +61,9 @@ postgres = [
 ]
 subscriber = [
     'typer',
+]
+docs = [
+    'apidaora'
 ]
 
 [tool.flit.sdist]
@@ -86,6 +89,7 @@ exclude = [
 
 [tool.flit.scripts]
 asyncapi-subscriber = "asyncapi:run_subscriber"
+asyncapi-docs = "asyncapi:run_docs"
 
 [tool.isort]
 case_sensitive= '1'

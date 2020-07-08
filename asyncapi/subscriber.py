@@ -17,13 +17,14 @@ from asyncapi import (
 def main(
     url: Optional[str] = typer.Option(None, envvar='ASYNCAPI_URL'),
     server: Optional[str] = typer.Option(None, envvar='ASYNCAPI_SERVER'),
-    api_module: str = typer.Option('', envvar='ASYNCAPI_OPERATIONS_MODULE'),
+    api_module: str = typer.Option('', envvar='ASYNCAPI_MODULE'),
     republish_errors: bool = typer.Option(
         True, envvar='ASYNCAPI_REPUBLISH_ERRORS'
     ),
     channel: Optional[str] = typer.Option(None, envvar='ASYNCAPI_CHANNEL'),
+    workers: int = typer.Option(1, envvar='ASYNCAPI_WORKERS'),
 ) -> None:
-    fork_app()
+    fork_app(workers)
 
     if url is None:
         if api_module is None:
@@ -66,6 +67,14 @@ def start(
     typer.echo('Waiting messages...')
 
 
+def task_callback(future: Any) -> None:
+    future.result()  # pragma: no cover
+
+
+def run() -> None:
+    typer.run(main)
+
+
 def graceful_stop() -> None:
     def exit_gracefully(signum: int = -1, frame: Any = None) -> None:
         signame = {  # type: ignore
@@ -77,21 +86,11 @@ def graceful_stop() -> None:
         time.sleep(1)
         raise SystemExit(0)
 
-        signal.signal(signal.SIGINT, exit_gracefully)
-        signal.signal(signal.SIGTERM, exit_gracefully)
+    signal.signal(signal.SIGINT, exit_gracefully)
+    signal.signal(signal.SIGTERM, exit_gracefully)
 
 
-def task_callback(future: Any) -> None:
-    future.result()  # pragma: no cover
-
-
-def run() -> None:
-    typer.run(main)  # pragma: no cover
-
-
-def fork_app() -> None:
-    workers = int(os.environ.get('ASYNCAPI_WORKERS', 1))
-
+def fork_app(workers: int) -> None:
     if workers > 1:
         typer.echo(f'Forking for {workers} workers')
         for _ in range(workers - 1):
@@ -101,4 +100,4 @@ def fork_app() -> None:
 
 
 if __name__ == '__main__':
-    run()  # pragma: no cover
+    run()

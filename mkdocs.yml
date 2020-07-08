@@ -19,6 +19,7 @@ edit_uri: ''
 nav:
     - Home: index.md
     - Declaring Specification: auto-spec.md
+    - Expose Docs: expose-docs.md
     - Development - Contributing: contributing.md
     - Changelog: changelog.md
 

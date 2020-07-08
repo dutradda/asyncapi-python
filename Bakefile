@@ -18,6 +18,6 @@ setup-asyncapi: //check-virtualenv
     pip install --force-reinstall git+https://github.com/pycqa/pyflakes
 
 coverage: //check-virtualenv
-    coverage combine .coverage.* docs/src/.coverage.*
+    coverage combine .coverage.* docs/src/.coverage.* docs/src/auto_spec/.coverage.*
     coverage report
     coverage xml

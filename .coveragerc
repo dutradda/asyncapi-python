@@ -5,7 +5,7 @@ omit =
     */test_*.py
     *conftest.py
     *venv*
-    asyncapi/_tests/__init__.py
+    */_tests/**
 
 [report]
 show_missing = True

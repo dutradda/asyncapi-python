@@ -61,6 +61,7 @@ class Specification:
     default_content_type: Optional[str] = None
 
 
+@dataclasses.dataclass(init=False)
 class Spec(Specification):
     def __init__(
         self,

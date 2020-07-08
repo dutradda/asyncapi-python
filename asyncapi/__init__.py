@@ -33,6 +33,9 @@ from .exceptions import (
 from .subscriber import run as run_subscriber
 
 
+from .docs import run as run_docs  # isort: skip
+
+
 __all__ = [
     'Channel',
     'Components',
@@ -57,4 +60,5 @@ __all__ = [
     'ReferenceNotFoundError',
     'UrlOrModuleRequiredError',
     'run_subscriber',
+    'run_docs',
 ]

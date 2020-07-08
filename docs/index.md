@@ -27,6 +27,8 @@
 
 - **Support for kafka, redis and postgres protocols (same as broadcaster library)**
 
+- **Expose in http the auto-generated specification**
+
 
 ## Requirements
 
@@ -36,6 +38,7 @@
  - requests (Optional for http specification)
  - typer (Optional for subscriber application)
  - pyyaml (Optional for yaml specification)
+ - apidaora (Optional for expose specification)
 
  - Package extra installs:
     + http
@@ -44,6 +47,7 @@
     + redis
     + postgres
     + subscriber
+    + docs
 
 
 ## Installation

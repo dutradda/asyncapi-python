@@ -1,0 +1,51 @@
+HTTP/1.1 200 OK
+date: ...
+server: uvicorn
+content-type: application/json
+content-length: 907
+
+{
+  "info": {
+    "title": "User Events",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": {
+    "development": {
+      "url": "localhost",
+      "protocol": "redis",
+      "description": ""
+    }
+  },
+  "channels": {
+    "user/update": {
+      "description": "",
+      "subscribe": {
+        "message": {
+          "name": "user/update",
+          "title": "",
+          "summary": "",
+          "payload": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "age": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "operationId": "receive_user_update"
+      }
+    }
+  },
+  "defaultContentType": "application/json"
+}

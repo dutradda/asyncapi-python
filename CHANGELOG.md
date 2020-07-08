@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.6.0 - 2020-07-08
 
  - Expose in http the auto-generated specification
 

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.6.1 - 2020-07-08
 
  - Update docs
 

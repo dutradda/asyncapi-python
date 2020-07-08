@@ -9,8 +9,8 @@ theme:
     palette:
       primary: deep-purple
       accent: grey
-    logo: asyncapi-python-white.svg
-    favicon: asyncapi-python.svg
+    logo: asyncapi-python-logo.svg
+    favicon: asyncapi-python-favicon.svg
 
 repo_name: dutradda/asyncapi-python
 repo_url: https://github.com/dutradda/asyncapi-python

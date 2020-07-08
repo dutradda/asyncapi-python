@@ -7,8 +7,12 @@
 </p>
 
 <p align="center">
-    Python library for translate asyncapi specification to python code, without code generation.
+    Python library for translate <a href="https://asyncapi.io">asyncapi</a> specification to python code, without code generation.
 </p>
+
+---
+
+**AsyncAPI Pattern**: <a href="https://asyncapi.io" target="_blank">https://asyncapi.io</a>
 
 ---
 

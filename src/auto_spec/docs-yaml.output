@@ -1,0 +1,36 @@
+HTTP/1.1 200 OK
+date: ...
+server: uvicorn
+content-type: application/x-yaml
+content-length: 590
+
+channels:
+  user/update:
+    description: ''
+    subscribe:
+      message:
+        name: user/update
+        payload:
+          properties:
+            age:
+              type: integer
+            id:
+              type: string
+            name:
+              type: string
+          required:
+          - id
+          type: object
+        summary: ''
+        title: ''
+      operationId: receive_user_update
+defaultContentType: application/json
+info:
+  description: ''
+  title: User Events
+  version: 1.0.0
+servers:
+  development:
+    description: ''
+    protocol: redis
+    url: localhost

@@ -33,7 +33,7 @@ class AsyncApi:
     def payload(self, channel_id: str, **message: Any) -> Any:
         type_ = self.payload_type(channel_id)
 
-        if type_:
+        if type_ and dataclasses.is_dataclass(type_):
             return asdataclass(message, type_)
 
         return message

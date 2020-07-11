@@ -14,6 +14,7 @@ class ProtocolType(Enum):
     KAFKA = 'kafka'
     REDIS = 'redis'
     POSTGRES = 'postgres'
+    GCLOUD_PUBSUB = 'gcloud-pubsub'
 
 
 @dataclasses.dataclass

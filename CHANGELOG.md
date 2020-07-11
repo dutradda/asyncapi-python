@@ -2,6 +2,8 @@
 
 ### UNRELEASED
 
+ - Add support for pubsub protocol
+
  - Fix api for non-dataclasses messsages
 
 ### 0.6.1 - 2020-07-08

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.7.0 - 2020-07-11
 
  - Add support for pubsub protocol
 

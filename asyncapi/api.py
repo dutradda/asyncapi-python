@@ -1,7 +1,7 @@
 import asyncio
 import dataclasses
 import logging
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict, Optional, Tuple
 
 import orjson
 from broadcaster import Broadcast
@@ -25,6 +25,7 @@ class AsyncApi:
     operations: OperationsTypeHint
     broadcast: Broadcast
     republish_error_messages: bool = True
+    error_messages_channel: Optional[str] = None
     logger: logging.Logger = logging.getLogger(__name__)
 
     async def connect(self) -> None:
@@ -92,15 +93,15 @@ class AsyncApi:
                 except KeyError:
                     raise OperationIdNotFoundError(operation_id)
 
-                except Exception as error:
+                except Exception:
+                    self.logger.exception('SUBSCRIBER ERROR')
+
                     if not self.republish_error_messages:
                         raise
 
-                    self.logger.warning(
-                        f'error={type(error).__name__}; '
-                        f"message={event.message[:100]}"
+                    await self.publish(
+                        self.error_messages_channel or channel_id, payload,
                     )
-                    await self.publish(channel_id, payload)
 
     def parse_message(self, channel_id: str, message: Any) -> Any:
         try:

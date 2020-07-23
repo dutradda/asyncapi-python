@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.7.1 - 2020-07-23
 
  - Improve subscriber error handler
 

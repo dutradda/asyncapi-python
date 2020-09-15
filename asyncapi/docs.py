@@ -1,10 +1,13 @@
 import dataclasses
 import importlib
 import json
+import os.path
 from enum import Enum
+from functools import partial
 from http import HTTPStatus
 from typing import Any, Dict, Iterable, List, Optional
 
+import jinja2
 import typer
 import uvicorn
 import yaml
@@ -13,6 +16,9 @@ from apidaora import (
     Response,
     RoutedControllerTypeHint,
     appdaora,
+    css,
+    html,
+    javascript,
     route,
 )
 
@@ -37,9 +43,11 @@ def main(
 
 
 def start(spec: Specification, host: str, port: int) -> None:
-    app = appdaora(
-        build_yaml_spec_controllers(spec) + [build_json_spec_controller(spec)]
-    )
+    controllers = build_yaml_spec_controllers(spec) + [
+        build_json_spec_controller(spec)
+    ]
+    controllers.extend(build_spec_docs_controllers(spec))
+    app = appdaora(controllers)
     uvicorn.run(app, host=host, port=port)
 
 
@@ -176,6 +184,52 @@ def _spec_asjson(generic_value: Any) -> Any:
         json_value = generic_value
 
     return json_value
+
+
+def build_spec_docs_controllers(
+    spec: Specification,
+) -> List[RoutedControllerTypeHint]:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = partial(os.path.join, current_dir, 'docs-template', 'template')
+    template_loader = jinja2.FileSystemLoader(
+        searchpath=os.path.join(current_dir, 'docs-template')
+    )
+    template_env = jinja2.Environment(loader=template_loader)
+    json_spec = spec_asjson(spec)
+
+    @route.get('/docs')
+    def index_controller() -> Response:
+        template = template_env.get_template('template/index.html')
+        return html(template.render(params={}, asyncapi=json_spec))
+
+    @route.get('/css/tailwind.min.css')
+    def tailwind_controller() -> Response:
+        return css(open(file_path('css', 'tailwind.min.css')).read())
+
+    @route.get('/css/atom-one-dark.min.css')
+    def atom_one_dark_controller() -> Response:
+        return css(open(file_path('css', 'atom-one-dark.min.css')).read())
+
+    @route.get('/css/main.css')
+    def main_css_controller() -> Response:
+        return css(open(file_path('css', 'main.css')).read())
+
+    @route.get('/js/highlight.min.js')
+    def highlight_controller() -> Response:
+        return javascript(open(file_path('js', 'highlight.min.js')).read())
+
+    @route.get('/js/main.js')
+    def main_js_controller() -> Response:
+        return javascript(open(file_path('js', 'main.js')).read())
+
+    return [
+        index_controller,
+        tailwind_controller,
+        atom_one_dark_controller,
+        main_css_controller,
+        highlight_controller,
+        main_js_controller,
+    ]
 
 
 def run() -> None:

@@ -63,7 +63,8 @@ subscriber = [
     'typer',
 ]
 docs = [
-    'apidaora'
+    'apidaora',
+    'jinja2',
 ]
 gcloud-pubsub = [
     'google-cloud-pubsub>=1,<2'

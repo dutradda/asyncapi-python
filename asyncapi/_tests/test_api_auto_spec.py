@@ -15,6 +15,19 @@ def test_should_get_api(fake_api):
 
 
 @pytest.mark.asyncio
+async def test_should_build_api_with_servers_bindings(
+    fake_broadcast_cls, server_bindings_str, mocker,
+):
+    asyncapi.build_api_auto_spec(
+        'asyncapi._tests', server_bindings=server_bindings_str
+    )
+
+    assert fake_broadcast_cls.call_args_list == [
+        mocker.call('kafka://fake.fake?option1=0.1&option2=0')
+    ]
+
+
+@pytest.mark.asyncio
 async def test_should_publish_message(
     fake_api, fake_broadcast, fake_message, mocker, json_message
 ):

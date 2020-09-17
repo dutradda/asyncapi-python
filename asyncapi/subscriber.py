@@ -17,6 +17,9 @@ from asyncapi import (
 def main(
     url: Optional[str] = typer.Option(None, envvar='ASYNCAPI_URL'),
     server: Optional[str] = typer.Option(None, envvar='ASYNCAPI_SERVER'),
+    server_bindings: Optional[str] = typer.Option(
+        None, envvar='ASYNCAPI_SERVER_BINDINGS'
+    ),
     api_module: str = typer.Option('', envvar='ASYNCAPI_MODULE'),
     republish_errors: bool = typer.Option(
         True, envvar='ASYNCAPI_REPUBLISH_ERRORS'
@@ -24,7 +27,6 @@ def main(
     channel: Optional[str] = typer.Option(None, envvar='ASYNCAPI_CHANNEL'),
     workers: int = typer.Option(1, envvar='ASYNCAPI_WORKERS'),
 ) -> None:
-    fork_app(workers)
 
     if url is None:
         if api_module is None:
@@ -33,6 +35,7 @@ def main(
         api = build_api_auto_spec(
             module_name=api_module,
             server=server,
+            server_bindings=server_bindings,
             republish_errors=republish_errors,
         )
 
@@ -41,9 +44,11 @@ def main(
             url,
             server=server,
             module_name=api_module,
+            server_bindings=server_bindings,
             republish_errors=republish_errors,
         )
 
+    fork_app(workers)
     graceful_stop()
     loop = get_event_loop()
     start(loop, api, channel)

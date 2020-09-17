@@ -49,6 +49,18 @@ def spec_dict():
     }
 
 
+@pytest.fixture
+def spec_dict_server_bindings(spec_dict):
+    bindings = {'kafka': {'option1': '0.1', 'option2': '0'}}
+    spec_dict['servers']['development']['bindings'] = bindings
+    return spec_dict
+
+
+@pytest.fixture
+def server_bindings_str():
+    return 'kafka:option1=0.1;option2=0'
+
+
 @pytest.fixture(autouse=True)
 def fake_yaml(mocker, spec_dict):
     yaml = mocker.patch.object(asyncapi.builder, 'yaml')
@@ -58,8 +70,13 @@ def fake_yaml(mocker, spec_dict):
 
 
 @pytest.fixture(autouse=True)
-def fake_broadcast(json_message, mocker, async_iterator):
-    broadcast = mocker.patch.object(asyncapi.builder, 'Broadcast').return_value
+def fake_broadcast_cls(json_message, mocker, async_iterator):
+    return mocker.patch.object(asyncapi.builder, 'Broadcast')
+
+
+@pytest.fixture(autouse=True)
+def fake_broadcast(fake_broadcast_cls, json_message, mocker, async_iterator):
+    broadcast = fake_broadcast_cls.return_value
     broadcast.publish = asynctest.CoroutineMock()
     broadcast.connect = asynctest.CoroutineMock()
     broadcast.subscribe.return_value = async_iterator(

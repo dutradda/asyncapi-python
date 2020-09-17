@@ -11,7 +11,7 @@ def fake_api():
 
 
 @pytest.fixture
-def fake_api_no_operation(spec_dict):
+def fake_api_no_operation():
     return asyncapi.build_api('fake')
 
 
@@ -24,6 +24,17 @@ def fake_api_no_operation_id(spec_dict):
 def test_should_get_api(fake_api):
     assert fake_api.spec
     assert fake_api.operations
+
+
+@pytest.mark.asyncio
+async def test_should_build_api_with_servers_bindings(
+    fake_broadcast_cls, mocker, server_bindings_str,
+):
+    asyncapi.build_api('fake', server_bindings=server_bindings_str)
+
+    assert fake_broadcast_cls.call_args_list == [
+        mocker.call('kafka://fake.fake?option1=0.1&option2=0')
+    ]
 
 
 @pytest.mark.asyncio

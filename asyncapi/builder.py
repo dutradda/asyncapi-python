@@ -1,12 +1,11 @@
 """
 asyncapi
 """
-
-__version__ = '0.2.0'
 import importlib
 import io
-from collections import deque
-from typing import Any, Dict, Optional
+from collections import defaultdict, deque
+from functools import partial
+from typing import Any, DefaultDict, Dict, Optional
 
 import requests
 import yaml
@@ -18,6 +17,8 @@ from .exceptions import (
     EmptyServersError,
     InvalidAsyncApiVersionError,
     InvalidContentTypeError,
+    InvalidServerBindingError,
+    InvalidServerBindingProtocolError,
     ReferenceNotFoundError,
     ServerNotFoundError,
 )
@@ -40,18 +41,71 @@ def build_api(
     server: Optional[str] = None,
     module_name: str = '',
     republish_errors: bool = True,
+    server_bindings: Optional[str] = None,
 ) -> AsyncApi:
     spec = build_spec(load_spec_dict(path))
-    return build_api_from_spec(spec, module_name, server, republish_errors)
+    set_api_spec_server_bindings(spec, server_bindings)
+    return build_api_from_spec(
+        spec, module_name, server, republish_errors, server_bindings,
+    )
 
 
 def build_api_auto_spec(
     module_name: str,
     server: Optional[str] = None,
     republish_errors: bool = True,
+    server_bindings: Optional[str] = None,
 ) -> AsyncApi:
     spec = getattr(importlib.import_module(module_name), 'spec')
-    return build_api_from_spec(spec, module_name, server, republish_errors)
+    set_api_spec_server_bindings(spec, server_bindings)
+    return build_api_from_spec(
+        spec, module_name, server, republish_errors, server_bindings,
+    )
+
+
+def set_api_spec_server_bindings(
+    spec: Specification, server_bindings: Optional[str]
+) -> None:
+    if server_bindings and spec.servers:
+        binding_str_list = server_bindings.split(',')
+        bindings_spec: DefaultDict[str, Dict[str, str]] = defaultdict(dict)
+
+        for binding_str in binding_str_list:
+            try:
+                protocol_str, protocol_bind_str = binding_str.split(':')
+            except ValueError:
+                raise InvalidServerBindingError(binding_str)
+
+            try:
+                protocol_bind_list = protocol_bind_str.split(';')
+            except ValueError:
+                raise InvalidServerBindingError(binding_str)
+
+            for protocol_bind_str in protocol_bind_list:
+                try:
+                    binding_name, binding_value = protocol_bind_str.split('=')
+                except ValueError:
+                    raise InvalidServerBindingError(protocol_bind_str)
+
+                bindings_spec[protocol_str][binding_name] = binding_value
+
+        for server_name, server in spec.servers.items():
+            new_server_bindings = build_server_bindings(
+                server_name, server.protocol, bindings_spec
+            )
+
+            if new_server_bindings:
+                for protocol, binding in new_server_bindings.items():
+                    already_server_bindings = server.bindings
+
+                    if already_server_bindings:
+                        if protocol in already_server_bindings:
+                            already_server_bindings[protocol].update(binding)
+                        else:
+                            already_server_bindings[protocol] = binding
+
+                    else:
+                        server.bindings = {protocol: binding}
 
 
 def build_api_from_spec(
@@ -59,6 +113,7 @@ def build_api_from_spec(
     module_name: str,
     server: Optional[str],
     republish_errors: bool,
+    server_bindings: Optional[str],
 ) -> AsyncApi:
     if spec.servers is None or not spec.servers:
         raise EmptyServersError()
@@ -67,17 +122,30 @@ def build_api_from_spec(
         server = tuple(spec.servers.keys())[-1]
 
     try:
-        protocol = spec.servers[server].protocol.value
+        spec.servers[server].protocol.value
     except KeyError:
         ServerNotFoundError(server)
 
-    url = spec.servers[server].url
     operations = build_channel_operations(spec, module_name)
-    broadcast = Broadcast(f'{protocol}://{url}')
+    broadcast = Broadcast(build_broadcaster_url(spec.servers[server]))
 
     return AsyncApi(
         spec, operations, broadcast, republish_error_messages=republish_errors
     )
+
+
+def build_broadcaster_url(server: Server) -> str:
+    url = f'{server.protocol.value}://{server.url}'
+
+    if server.bindings and server.protocol in server.bindings:
+        url += '?' + '&'.join(
+            [
+                f'{name}={value}'
+                for name, value in server.bindings[server.protocol].items()
+            ]
+        )
+
+    return url
 
 
 def build_channel_operations(
@@ -85,7 +153,15 @@ def build_channel_operations(
 ) -> OperationsTypeHint:
     if module_name:
         return {
-            (channel_name, channel.subscribe.operation_id): getattr(
+            (channel_name, channel.subscribe.operation_id): partial(
+                getattr(
+                    importlib.import_module(module_name),
+                    channel.subscribe.operation_id,
+                ),
+                bindings=channel.bindings,
+            )
+            if channel.bindings
+            else getattr(
                 importlib.import_module(module_name),
                 channel.subscribe.operation_id,
             )
@@ -122,11 +198,7 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
     return Specification(
         info=Info(**spec['info']),
         servers={
-            server_name: Server(
-                name=server_name,
-                protocol=ProtocolType(server_spec.pop('protocol')),
-                **server_spec,
-            )
+            server_name: build_server(server_name, server_spec)
             for server_name, server_spec in spec['servers'].items()
         }
         if 'servers' in spec
@@ -134,6 +206,44 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
         channels=build_channels(spec),
         components=build_components(spec.get('components')),
     )
+
+
+def build_server(server_name: str, server_spec: Dict[str, Any]) -> Server:
+    protocol = ProtocolType(server_spec.pop('protocol'))
+    bindings = build_server_bindings(
+        server_name, protocol, server_spec.pop('bindings', None)
+    )
+    return Server(
+        name=server_name, protocol=protocol, bindings=bindings, **server_spec,
+    )
+
+
+def build_server_bindings(
+    server_name: str,
+    server_protocol: ProtocolType,
+    bindings_spec: Optional[Dict[str, Dict[str, str]]],
+) -> Optional[Dict[ProtocolType, Dict[str, str]]]:
+    if bindings_spec:
+        server_bindings = {}
+
+        for protocol_str, bindings in bindings_spec.items():
+            try:
+                binding_protocol = ProtocolType(protocol_str)
+            except ValueError:
+                raise InvalidServerBindingProtocolError(
+                    server_name, protocol_str
+                )
+
+            if binding_protocol != server_protocol:
+                raise InvalidServerBindingProtocolError(
+                    server_name, protocol_str
+                )
+
+            server_bindings[binding_protocol] = bindings
+
+        return server_bindings
+
+    return None
 
 
 def validate_content_type(content_type: str) -> None:

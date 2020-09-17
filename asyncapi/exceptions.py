@@ -44,3 +44,11 @@ class InvalidContentTypeError(AsyncApiError):
 
 class InvalidAsyncApiVersionError(AsyncApiError):
     ...
+
+
+class InvalidServerBindingError(AsyncApiError):
+    ...
+
+
+class InvalidServerBindingProtocolError(AsyncApiError):
+    ...

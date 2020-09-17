@@ -51,5 +51,22 @@ def expected_spec(fake_jsonschema_asdataclass):
     )
 
 
+@pytest.fixture
+def expected_server_bindings_spec(expected_spec):
+    expected_spec.servers['development'].bindings = {
+        asyncapi.ProtocolType.KAFKA: {'option1': '0.1', 'option2': '0'}
+    }
+    return expected_spec
+
+
 def test_should_build_spec(spec_dict, expected_spec):
     assert asyncapi.build_spec(spec_dict) == expected_spec
+
+
+def test_should_build_spec_with_server_bindings(
+    spec_dict_server_bindings, expected_server_bindings_spec
+):
+    assert (
+        asyncapi.build_spec(spec_dict_server_bindings)
+        == expected_server_bindings_spec
+    )

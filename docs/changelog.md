@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.8.0 - 2020-09-17
 
  - Improve specification exposition
 

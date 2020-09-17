@@ -2,11 +2,11 @@ HTTP/1.1 200 OK
 date: ...
 server: uvicorn
 content-type: application/x-yaml
-content-length: 590
+content-length: 510
 
+asyncapi: 2.0.0
 channels:
   user/update:
-    description: ''
     subscribe:
       message:
         name: user/update
@@ -21,16 +21,12 @@ channels:
           required:
           - id
           type: object
-        summary: ''
-        title: ''
       operationId: receive_user_update
 defaultContentType: application/json
 info:
-  description: ''
   title: User Events
   version: 1.0.0
 servers:
   development:
-    description: ''
     protocol: redis
     url: localhost

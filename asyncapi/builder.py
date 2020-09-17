@@ -14,17 +14,25 @@ from broadcaster import Broadcast
 from jsondaora import jsonschema_asdataclass
 
 from .api import AsyncApi, OperationsTypeHint
-from .entities import (
+from .exceptions import (
+    EmptyServersError,
+    InvalidAsyncApiVersionError,
+    InvalidContentTypeError,
+    ReferenceNotFoundError,
+    ServerNotFoundError,
+)
+from .specification_v2_0_0 import (
+    ASYNCAPI_VERSION,
+    DEFAULT_CONTENT_TYPE,
     Channel,
     Components,
     Info,
     Message,
+    Operation,
     ProtocolType,
     Server,
     Specification,
-    Subscribe,
 )
-from .exceptions import ReferenceNotFoundError
 
 
 def build_api(
@@ -52,14 +60,21 @@ def build_api_from_spec(
     server: Optional[str],
     republish_errors: bool,
 ) -> AsyncApi:
-    operations = build_channel_operations(spec, module_name)
+    if spec.servers is None or not spec.servers:
+        raise EmptyServersError()
 
     if server is None:
         server = tuple(spec.servers.keys())[-1]
 
-    protocol = spec.servers[server].protocol.value
+    try:
+        protocol = spec.servers[server].protocol.value
+    except KeyError:
+        ServerNotFoundError(server)
+
     url = spec.servers[server].url
+    operations = build_channel_operations(spec, module_name)
     broadcast = Broadcast(f'{protocol}://{url}')
+
     return AsyncApi(
         spec, operations, broadcast, republish_error_messages=republish_errors
     )
@@ -75,7 +90,7 @@ def build_channel_operations(
                 channel.subscribe.operation_id,
             )
             for channel_name, channel in spec.channels.items()
-            if channel.subscribe.operation_id
+            if channel.subscribe and channel.subscribe.operation_id
         }
 
     return {}
@@ -101,6 +116,8 @@ def load_spec_dict(path: str) -> Dict[str, Any]:
 
 def build_spec(spec: Dict[str, Any]) -> Specification:
     fill_refs(spec)
+    validate_content_type(spec.get('defaultContentType', DEFAULT_CONTENT_TYPE))
+    validate_asyncapi_version(spec.get('asyncapi', ASYNCAPI_VERSION))
 
     return Specification(
         info=Info(**spec['info']),
@@ -111,64 +128,93 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
                 **server_spec,
             )
             for server_name, server_spec in spec['servers'].items()
-        },
-        channels={
-            channel_name: Channel(
-                name=channel_name,
-                subscribe=Subscribe(
-                    message=Message(
-                        content_type=channel_spec['subscribe']['message'].get(
-                            'contentType', spec.get('defaultContentType')
-                        ),
-                        payload=jsonschema_asdataclass(
-                            channel_spec['subscribe']['message'][
-                                'name'
-                            ].replace(' ', ''),
-                            channel_spec['subscribe']['message'].get(
-                                'payload'
-                            ),
-                        ),
-                        **{
-                            k: v
-                            for k, v in channel_spec['subscribe'][
-                                'message'
-                            ].items()
-                            if k != 'contentType' and k != 'payload'
-                        },
-                    ),
-                    operation_id=channel_spec.pop('subscribe').get(
-                        'operationId', None
-                    ),
-                ),
-                **channel_spec,
-            )
-            for channel_name, channel_spec in spec['channels'].items()
-        },
-        components=Components(
-            messages={
-                msg_id: Message(
-                    content_type=message.get(
-                        'contentType', spec.get('defaultContentType')
-                    ),
-                    payload=jsonschema_asdataclass(
-                        message['name'].replace(' ', ''),
-                        message.get('payload'),
-                    ),
-                    **{
-                        k: v
-                        for k, v in message.items()
-                        if k != 'contentType' and k != 'payload'
-                    },
-                )
-                for msg_id, message in spec['components']['messages'].items()
-            }
-            if 'messages' in spec['components']
-            else None,
-            schemas=spec['components'].get('schemas'),
-        )
-        if 'components' in spec
+        }
+        if 'servers' in spec
         else None,
-        default_content_type=spec.get('defaultContentType'),
+        channels=build_channels(spec),
+        components=build_components(spec.get('components')),
+    )
+
+
+def validate_content_type(content_type: str) -> None:
+    if content_type != DEFAULT_CONTENT_TYPE:
+        raise InvalidContentTypeError(
+            content_type, f'valid content types: {DEFAULT_CONTENT_TYPE}'
+        )
+
+
+def validate_asyncapi_version(asyncapi_version: str) -> None:
+    if asyncapi_version != ASYNCAPI_VERSION:
+        raise InvalidAsyncApiVersionError(
+            asyncapi_version, f'valid versions: {ASYNCAPI_VERSION}'
+        )
+
+
+def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
+    channels = {}
+
+    for channel_name, channel_spec in spec['channels'].items():
+        content_type = channel_spec['subscribe']['message'].get('contentType')
+
+        if content_type:
+            validate_content_type(content_type)
+
+        channels[channel_name] = Channel(
+            name=channel_name,
+            subscribe=build_operation(channel_spec.pop('subscribe', None)),
+            publish=build_operation(channel_spec.pop('publish', None)),
+            **channel_spec,
+        )
+
+    return channels
+
+
+def build_operation(
+    operation_spec: Optional[Dict[str, Any]]
+) -> Optional[Operation]:
+    if operation_spec is None:
+        return None
+
+    message_spec = operation_spec.get('message')
+
+    return Operation(
+        message=build_message(message_spec) if message_spec else None,
+        operation_id=operation_spec.get('operationId', None),
+    )
+
+
+def build_message(message_spec: Dict[str, Any]) -> Message:
+    if message_spec is None:
+        return None
+
+    return Message(
+        content_type=message_spec.get('contentType'),
+        payload=jsonschema_asdataclass(
+            message_spec['name'].replace(' ', ''),
+            message_spec.get('payload', {}),
+        ),
+        **{
+            k: v
+            for k, v in message_spec.items()
+            if k != 'contentType' and k != 'payload'
+        },
+    )
+
+
+def build_components(
+    components_spec: Optional[Dict[str, Any]]
+) -> Optional[Components]:
+    if components_spec is None:
+        return None
+
+    return Components(
+        messages={
+            msg_id: build_message(message_spec)
+            for msg_id, message_spec in components_spec['messages'].items()
+        }
+        if 'messages' in components_spec
+        else None,
+        schemas=components_spec.get('schemas'),
     )
 
 

@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Fix specification dataclasses
+
 ### 0.7.2 - 2020-09-04
 
  - Improve api.listen logging

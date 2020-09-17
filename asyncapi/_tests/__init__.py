@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from asyncapi import Spec
+from asyncapi import AutoSpec
 
 
-spec = Spec(
+spec = AutoSpec(
     title='Fake API',
     description='Faked API',
     version='0.0.1',

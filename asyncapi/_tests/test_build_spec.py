@@ -34,8 +34,8 @@ def expected_spec(fake_jsonschema_asdataclass):
             'fake': asyncapi.Channel(
                 name='fake',
                 description='Fake Channel',
-                subscribe=asyncapi.Subscribe(
-                    message, operation_id='fake_operation'
+                subscribe=asyncapi.Operation(
+                    operation_id='fake_operation', message=message,
                 ),
             )
         },

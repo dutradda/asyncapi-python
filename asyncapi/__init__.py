@@ -12,23 +12,23 @@ from .builder import (
     dict_from_ref,
     fill_refs,
 )
-from .entities import (
-    Channel,
-    Components,
-    Info,
-    Message,
-    ProtocolType,
-    Server,
-    Spec,
-    Specification,
-    Subscribe,
-)
 from .exceptions import (
     ChannelOperationNotFoundError,
     InvalidChannelError,
     OperationIdNotFoundError,
     ReferenceNotFoundError,
     UrlOrModuleRequiredError,
+)
+from .specification_v2_0_0 import (
+    AutoSpec,
+    Channel,
+    Components,
+    Info,
+    Message,
+    Operation,
+    ProtocolType,
+    Server,
+    Specification,
 )
 from .subscriber import run as run_subscriber
 
@@ -44,8 +44,8 @@ __all__ = [
     'ProtocolType',
     'Server',
     'Specification',
-    'Subscribe',
-    'Spec',
+    'Operation',
+    'AutoSpec',
     'AsyncApi',
     'OperationsTypeHint',
     'build_api',

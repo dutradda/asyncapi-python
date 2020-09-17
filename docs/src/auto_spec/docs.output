@@ -3,3 +3,5 @@ INFO:     Waiting for application startup.
 INFO:     ASGI 'lifespan' protocol appears unsupported.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [...]

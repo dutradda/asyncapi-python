@@ -7,13 +7,13 @@ import orjson
 from broadcaster import Broadcast
 from jsondaora import DeserializationError, asdataclass, dataclass_asjson
 
-from .entities import Specification
 from .exceptions import (
     ChannelOperationNotFoundError,
     InvalidChannelError,
     InvalidMessageError,
     OperationIdNotFoundError,
 )
+from .specification_v2_0_0 import Operation, Specification
 
 
 OperationsTypeHint = Dict[Tuple[str, str], Callable[..., Any]]
@@ -65,12 +65,10 @@ class AsyncApi:
         await asyncio.gather(*tasks)
 
     async def listen(self, channel_id: str) -> None:
-        try:
-            operation_id = self.spec.channels[
-                channel_id
-            ].subscribe.operation_id
-        except KeyError:
+        if self.spec.channels is None:
             raise InvalidChannelError(channel_id)
+
+        operation_id = self.subscribe_operation(channel_id).operation_id
 
         if operation_id is None:
             raise ChannelOperationNotFoundError(channel_id)
@@ -92,33 +90,44 @@ class AsyncApi:
                 except KeyError:
                     raise OperationIdNotFoundError(operation_id)
 
-                except Exception as error:
+                except Exception:
                     if not self.republish_error_messages:
                         raise
 
                     self.logger.exception(f"message={event.message[:100]}")
                     await self.publish(channel_id, payload)
 
-    def parse_message(self, channel_id: str, message: Any) -> Any:
+    def subscribe_operation(self, channel_id: str) -> Operation:
         try:
-            type_ = self.spec.channels[channel_id].subscribe.message.payload
+            operation = self.spec.channels[channel_id].subscribe
+
+            if operation is None:
+                raise InvalidChannelError(channel_id)
+
         except KeyError:
             raise InvalidChannelError(channel_id)
 
-        if type_:
-            if not isinstance(message, type_):
-                raise InvalidMessageError(message, type_)
+        else:
+            return operation
 
-            v = dataclass_asjson(message)
-            return v
+    def parse_message(self, channel_id: str, message: Any) -> Any:
+        payload_type = self.payload_type(channel_id)
+
+        if payload_type:
+            if not isinstance(message, payload_type):
+                raise InvalidMessageError(message, payload_type)
+
+            return dataclass_asjson(message)
 
         return message
 
     def payload_type(self, channel_id: str) -> Any:
-        try:
-            return self.spec.channels[channel_id].subscribe.message.payload
-        except KeyError:
-            raise InvalidChannelError(channel_id)
+        operation = self.subscribe_operation(channel_id)
+
+        if operation.message is None:
+            return None
+
+        return operation.message.payload
 
 
 def task_callback(future: Any) -> None:

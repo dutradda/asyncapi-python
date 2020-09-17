@@ -56,3 +56,7 @@ class InvalidServerBindingProtocolError(AsyncApiError):
 
 class InvalidChannelsSubscribersError(AsyncApiError):
     ...
+
+
+class ChannelPublishNotFoundError(AsyncApiError):
+    ...

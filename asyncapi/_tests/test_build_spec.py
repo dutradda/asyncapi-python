@@ -37,6 +37,7 @@ def expected_spec(fake_jsonschema_asdataclass):
                 subscribe=asyncapi.Operation(
                     operation_id='fake_operation', message=message,
                 ),
+                publish=asyncapi.Operation(message=message),
             )
         },
         components=asyncapi.Components(

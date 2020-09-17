@@ -17,19 +17,27 @@ channels:
     subscribe:
       operationId: receive_user_update
       message:
-        name: userUpdate
-        title: User Update
-        summary: Inform about users updates
-        payload:
-          type: object
-          required:
-            - id
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-            age:
-              type: integer
+        $ref: '#/components/messages/UserUpdate'
+    publish:
+      message:
+        $ref: '#/components/messages/UserUpdate'
+
+components:
+  messages:
+    UserUpdate:
+      name: userUpdate
+      title: User Update
+      summary: Inform about users updates
+      payload:
+        type: object
+        required:
+          - id
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          age:
+            type: integer
 
 defaultContentType: application/json

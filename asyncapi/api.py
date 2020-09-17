@@ -1,7 +1,7 @@
 import asyncio
 import dataclasses
 import logging
-from typing import Any, Callable, Dict, Tuple
+from typing import Any, Callable, Dict, Tuple, Type
 
 import orjson
 from broadcaster import Broadcast
@@ -9,6 +9,7 @@ from jsondaora import DeserializationError, asdataclass, dataclass_asjson
 
 from .exceptions import (
     ChannelOperationNotFoundError,
+    ChannelPublishNotFoundError,
     InvalidChannelError,
     InvalidMessageError,
     OperationIdNotFoundError,
@@ -27,17 +28,6 @@ class AsyncApi:
     republish_error_messages: bool = True
     logger: logging.Logger = logging.getLogger(__name__)
 
-    async def connect(self) -> None:
-        await self.broadcast.connect()
-
-    def payload(self, channel_id: str, **message: Any) -> Any:
-        type_ = self.payload_type(channel_id)
-
-        if type_ and dataclasses.is_dataclass(type_):
-            return asdataclass(message, type_)
-
-        return message
-
     async def publish_json(
         self, channel_id: str, message: Dict[str, Any]
     ) -> None:
@@ -53,6 +43,25 @@ class AsyncApi:
             channel=channel_id,
             message=self.parse_message(channel_id, message).decode(),
         )
+
+    async def connect(self) -> None:
+        await self.broadcast.connect()
+
+    def payload(self, channel_id: str, **message: Any) -> Any:
+        type_ = self.publish_payload_type(channel_id)
+        return self.payload_type(type_, channel_id, **message)
+
+    def subscriber_payload(self, channel_id: str, **message: Any) -> Any:
+        type_ = self.subscribe_payload_type(channel_id)
+        return self.payload_type(type_, channel_id, **message)
+
+    def payload_type(
+        self, type_: Type[Any], channel_id: str, **message: Any
+    ) -> Any:
+        if type_ and dataclasses.is_dataclass(type_):
+            return asdataclass(message, type_)
+
+        return message
 
     async def listen_all(self) -> None:
         tasks = []
@@ -77,7 +86,9 @@ class AsyncApi:
             async for event in subscriber:
                 try:
                     json_message = orjson.loads(event.message)
-                    payload = self.payload(channel_id, **json_message)
+                    payload = self.subscriber_payload(
+                        channel_id, **json_message
+                    )
 
                     coro = self.operations[(channel_id, operation_id)](payload)
 
@@ -95,14 +106,26 @@ class AsyncApi:
                         raise
 
                     self.logger.exception(f"message={event.message[:100]}")
-                    await self.publish(channel_id, payload)
+
+                    try:
+                        await self.publish(channel_id, payload)
+                    except UnboundLocalError:
+                        await self.publish_json(channel_id, json_message)
+
+    def publish_operation(self, channel_id: str) -> Operation:
+        return self.operation('publish', channel_id)
 
     def subscribe_operation(self, channel_id: str) -> Operation:
+        return self.operation('subscribe', channel_id)
+
+    def operation(self, op_name: str, channel_id: str) -> Operation:
+        operation: Operation
+
         try:
-            operation = self.spec.channels[channel_id].subscribe
+            operation = getattr(self.spec.channels[channel_id], op_name)
 
             if operation is None:
-                raise InvalidChannelError(channel_id)
+                raise ChannelPublishNotFoundError(channel_id)
 
         except KeyError:
             raise InvalidChannelError(channel_id)
@@ -111,17 +134,25 @@ class AsyncApi:
             return operation
 
     def parse_message(self, channel_id: str, message: Any) -> Any:
-        payload_type = self.payload_type(channel_id)
+        type_ = self.publish_payload_type(channel_id)
 
-        if payload_type:
-            if not isinstance(message, payload_type):
-                raise InvalidMessageError(message, payload_type)
+        if type_:
+            if not isinstance(message, type_):
+                raise InvalidMessageError(message, type_)
 
             return dataclass_asjson(message)
 
         return message
 
-    def payload_type(self, channel_id: str) -> Any:
+    def publish_payload_type(self, channel_id: str) -> Any:
+        operation = self.publish_operation(channel_id)
+
+        if operation.message is None:
+            return None
+
+        return operation.message.payload
+
+    def subscribe_payload_type(self, channel_id: str) -> Any:
         operation = self.subscribe_operation(channel_id)
 
         if operation.message is None:

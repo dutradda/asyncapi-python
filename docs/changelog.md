@@ -2,6 +2,8 @@
 
 ### UNRELEASED
 
+ - Improve specification exposition
+
  - Fix specification dataclasses
 
 ### 0.7.2 - 2020-09-04

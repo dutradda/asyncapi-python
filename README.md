@@ -27,6 +27,8 @@
 
 - **Reads an asyncapi specification and create publishers and subscribers from it**
 
+- **Support for specification declaration with dataclasses**
+
 - **Provides application for create subscribers**
 
 - **Support for kafka, redis and postgres protocols (same as broadcaster library)**
@@ -57,7 +59,7 @@
 ## Installation
 
 ```
-$ pip install asyncapi[http,yaml,redis,subscriber]
+$ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ```
 
 
@@ -83,27 +85,34 @@ channels:
     subscribe:
       operationId: receive_user_update
       message:
-        name: userUpdate
-        title: User Update
-        summary: Inform about users updates
-        payload:
-          type: object
-          required:
-            - id
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-            age:
-              type: integer
+        $ref: '#/components/messages/UserUpdate'
+    publish:
+      message:
+        $ref: '#/components/messages/UserUpdate'
+
+components:
+  messages:
+    UserUpdate:
+      name: userUpdate
+      title: User Update
+      summary: Inform about users updates
+      payload:
+        type: object
+        required:
+          - id
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          age:
+            type: integer
 
 defaultContentType: application/json
 
 ```
 
-
-## Creating subscribers module
+### Creating subscribers module
 
 ```python
 # user_events.py
@@ -116,7 +125,7 @@ async def receive_user_update(message: Any) -> None:
 
 ```
 
-## Start subscriber to listen events
+### Start subscriber to listen events
 
 ```bash
 PYTHONPATH=. asyncapi-subscriber \
@@ -130,8 +139,7 @@ Waiting messages...
 
 ```
 
-
-## Publishing Updates
+### Publishing Updates
 
 ```python
 # publish.py
@@ -158,15 +166,160 @@ print(f"Published update for user={message.id}")
 ```
 
 ```
+python publish.py
+
 Published update for user=fake-user
 
 ```
 
-
-## Receive Updates
+### Receive Updates
 
 ```
 Waiting messages...
 Received update for user id=fake-user
 
+```
+
+### Expose Specification
+
+
+```bash
+PYTHONPATH=. asyncapi-docs --path api-spec.yaml
+
+```
+
+```bash
+curl -i localhost:5000/asyncapi.yaml
+```
+
+
+## Python Specification Example
+
+```python
+# specification.py
+
+import dataclasses
+from typing import Optional
+
+import asyncapi
+
+
+@dataclasses.dataclass
+class UserUpdatePayload:
+    id: str
+    name: Optional[str] = None
+    age: Optional[int] = None
+
+
+dev_server = asyncapi.Server(
+    url='localhost',
+    protocol=asyncapi.ProtocolType.REDIS,
+    description='Development Broker Server',
+)
+message = asyncapi.Message(
+    name='userUpdate',
+    title='User Update',
+    summary='Inform about users updates',
+    payload=UserUpdatePayload,
+)
+user_update_channel = asyncapi.Channel(
+    description='Topic for user updates',
+    subscribe=asyncapi.Operation(
+        operation_id='receive_user_update', message=message,
+    ),
+    publish=asyncapi.Operation(message=message),
+)
+
+spec = asyncapi.Specification(
+    info=asyncapi.Info(
+        title='User API', version='1.0.0', description='API do manage users',
+    ),
+    servers={'development': dev_server},
+    channels={'user/update': user_update_channel},
+    components=asyncapi.Components(messages={'UserUpdate': message}),
+)
+
+```
+
+### Creating subscribers module
+
+```python
+# py_spec_user_events.py
+
+import specification
+
+
+spec = specification.spec
+
+
+async def receive_user_update(
+    message: specification.UserUpdatePayload,
+) -> None:
+    print(f"Received update for user id={message.id}")
+
+```
+
+### Start subscriber to listen events
+
+```bash
+PYTHONPATH=. asyncapi-subscriber --api-module py_spec_user_events
+
+```
+
+```
+Waiting messages...
+
+```
+
+### Publishing Updates
+
+```python
+# py_spec_publish.py
+
+import asyncio
+
+from asyncapi import build_api_auto_spec
+
+
+api = build_api_auto_spec('specification')
+channel_id = 'user/update'
+message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
+
+
+async def publish() -> None:
+    await api.connect()
+    await api.publish(channel_id, message)
+
+
+asyncio.run(publish())
+
+print(f"Published update for user={message.id}")
+
+```
+
+```
+python py_spec_publish.py
+
+Published update for user=fake-user
+
+```
+
+### Receive Updates
+
+```
+Waiting messages...
+Received update for user id=fake-user
+
+```
+
+### Expose Specification
+
+
+```bash
+PYTHONPATH=. asyncapi-docs --api-module specification
+
+```
+
+```bash
+curl -i localhost:5000/asyncapi.yaml
 ```

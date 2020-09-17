@@ -27,6 +27,9 @@ def spec_dict():
                     'operationId': 'fake_operation',
                     'message': {'$ref': '#/components/messages/FakeMessage'},
                 },
+                'publish': {
+                    'message': {'$ref': '#/components/messages/FakeMessage'},
+                },
             }
         },
         'components': {
@@ -47,6 +50,14 @@ def spec_dict():
             },
         },
     }
+
+
+@pytest.fixture
+def spec_dict_publish(spec_dict):
+    spec_dict['channels']['fake']['publish'] = spec_dict['channels'][
+        'fake'
+    ].pop('subscribe')
+    return spec_dict
 
 
 @pytest.fixture
@@ -88,6 +99,11 @@ def fake_broadcast(fake_broadcast_cls, json_message, mocker, async_iterator):
 @pytest.fixture
 def fake_message(fake_api):
     return fake_api.spec.channels['fake'].subscribe.message.payload(1)
+
+
+@pytest.fixture
+def fake_publish_message(fake_api):
+    return fake_api.spec.channels['fake'].publish.message.payload(1)
 
 
 @pytest.fixture

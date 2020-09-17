@@ -3,7 +3,7 @@ import importlib
 import json
 from enum import Enum
 from http import HTTPStatus
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 import typer
 import uvicorn
@@ -16,20 +16,27 @@ from apidaora import (
     route,
 )
 
-from asyncapi import AutoSpec
+from asyncapi import Operation, Specification
+from asyncapi.builder import build_spec_from_path
 from asyncapi.schema import type_as_jsonschema
+from asyncapi.specification_v2_0_0 import as_camel_case
 
 
 def main(
     api_module: str = typer.Option('', envvar='ASYNCAPI_MODULE'),
     host: str = typer.Option('0.0.0.0', envvar='ASYNCAPI_HOST'),
     port: int = typer.Option(5000, envvar='ASYNCAPI_PORT'),
+    path: Optional[str] = typer.Option(None, envvar='ASYNCAPI_PATH'),
 ) -> None:
-    spec = getattr(importlib.import_module(api_module), 'spec')
+    if path:
+        spec = build_spec_from_path(path)
+    else:
+        spec = getattr(importlib.import_module(api_module), 'spec')
+
     start(spec, host, port)
 
 
-def start(spec: AutoSpec, host: str, port: int) -> None:
+def start(spec: Specification, host: str, port: int) -> None:
     app = appdaora(
         build_yaml_spec_controllers(spec) + [build_json_spec_controller(spec)]
     )
@@ -37,7 +44,7 @@ def start(spec: AutoSpec, host: str, port: int) -> None:
 
 
 def build_yaml_spec_controllers(
-    spec: AutoSpec,
+    spec: Specification,
 ) -> List[RoutedControllerTypeHint]:
     def controller() -> Response:
         return Response(
@@ -58,7 +65,9 @@ def build_yaml_spec_controllers(
     return [controller_yaml, controller_yml]
 
 
-def build_json_spec_controller(spec: AutoSpec) -> RoutedControllerTypeHint:
+def build_json_spec_controller(
+    spec: Specification,
+) -> RoutedControllerTypeHint:
     @route.get('/asyncapi.json')
     def controller() -> Response:
         return Response(
@@ -71,8 +80,23 @@ def build_json_spec_controller(spec: AutoSpec) -> RoutedControllerTypeHint:
     return controller
 
 
-def spec_asjson(spec: AutoSpec) -> Dict[str, Any]:
+def spec_asjson(spec: Specification) -> Dict[str, Any]:
     json_spec: Dict[str, Any] = _spec_asjson(spec)
+    spec_messages_dict = (
+        spec.components.messages
+        if spec.components and spec.components.messages
+        else {}
+    )
+    json_spec_messages = {}
+
+    for message_name, message_type in spec_messages_dict.items():
+        if message_type.payload:
+            json_spec['components']['messages'][message_name][
+                'payload'
+            ] = type_as_jsonschema(message_type.payload)
+
+            if message_type.name:
+                json_spec_messages[message_type.name] = message_name
 
     for server in json_spec['servers'].values():
         server.pop('name', None)
@@ -80,19 +104,47 @@ def spec_asjson(spec: AutoSpec) -> Dict[str, Any]:
     for channel_dict, channel in zip(
         json_spec['channels'].values(), spec.channels.values()
     ):
-        channel_dict.pop('name')
-        channel_dict['subscribe']['message'].pop('contentType', None)
+        channel_dict.pop('name', None)
 
-        if (
-            channel.subscribe
-            and channel.subscribe.message
-            and channel.subscribe.message.payload
-        ):
-            channel_dict['subscribe']['message'][
-                'payload'
-            ] = type_as_jsonschema(channel.subscribe.message.payload)
+        if 'subscribe' in channel_dict:
+            set_operation_message(
+                channel_dict['subscribe'],
+                channel.subscribe,
+                json_spec_messages,
+            )
+
+        if 'publish' in channel_dict:
+            set_operation_message(
+                channel_dict['publish'], channel.publish, json_spec_messages
+            )
 
     return json_spec
+
+
+def set_operation_message(
+    operation_dict: Dict[str, Any],
+    operation: Optional[Operation],
+    json_spec_messages: Dict[str, str],
+) -> None:
+    operation_dict['message'].pop('contentType', None)
+
+    if (
+        operation
+        and operation.message
+        and operation.message.name
+        and operation.message.name in json_spec_messages
+    ):
+        operation_dict['message'] = {
+            '$ref': (
+                '#/components/messages/'
+                f'{json_spec_messages[operation.message.name]}'
+            )
+        }
+
+    elif operation and operation.message and operation.message.payload:
+        operation_dict['message']['payload'] = type_as_jsonschema(
+            operation.message.payload
+        )
 
 
 def _spec_asjson(generic_value: Any) -> Any:
@@ -124,11 +176,6 @@ def _spec_asjson(generic_value: Any) -> Any:
         json_value = generic_value
 
     return json_value
-
-
-def as_camel_case(snake_str: str) -> str:
-    components = snake_str.split('_')
-    return components[0] + ''.join(x.title() for x in components[1:])
 
 
 def run() -> None:

@@ -44,7 +44,7 @@ def build_api(
     server_bindings: Optional[str] = None,
     channels_subscribes: Optional[str] = None,
 ) -> AsyncApi:
-    spec = build_spec(load_spec_dict(path))
+    spec = build_spec_from_path(path)
     set_api_spec_server_bindings(spec, server_bindings)
     set_api_spec_channels_subscribes(spec, channels_subscribes)
     return build_api_from_spec(
@@ -63,6 +63,10 @@ def build_api_auto_spec(
     return build_api_from_spec(
         spec, module_name, server, republish_errors, server_bindings,
     )
+
+
+def build_spec_from_path(path: str) -> Specification:
+    return build_spec(load_spec_dict(path))
 
 
 def set_api_spec_server_bindings(
@@ -221,17 +225,25 @@ def build_broadcaster_url(server: Server) -> str:
 def build_channel_operations(
     spec: Specification, module_name: str
 ) -> OperationsTypeHint:
-    if module_name:
-        return {
-            (channel_name, channel.subscribe.operation_id): getattr(
-                importlib.import_module(module_name),
-                channel.subscribe.operation_id,
-            )
-            for channel_name, channel in spec.channels.items()
-            if channel.subscribe and channel.subscribe.operation_id
-        }
+    operations = {}
 
-    return {}
+    if module_name:
+        for channel_name, channel in spec.channels.items():
+            if channel.subscribe and channel.subscribe.operation_id:
+                operation = getattr(
+                    importlib.import_module(module_name),
+                    channel.subscribe.operation_id,
+                    None,
+                )
+
+                if operation:
+                    operation_key = (
+                        channel_name,
+                        channel.subscribe.operation_id,
+                    )
+                    operations[operation_key] = operation
+
+    return operations
 
 
 def load_spec_dict(path: str) -> Dict[str, Any]:

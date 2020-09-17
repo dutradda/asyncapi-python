@@ -27,6 +27,8 @@
 
 - **Reads an asyncapi specification and create publishers and subscribers from it**
 
+- **Support for specification declaration with dataclasses**
+
 - **Provides application for create subscribers**
 
 - **Support for kafka, redis and postgres protocols (same as broadcaster library)**
@@ -57,7 +59,7 @@
 ## Installation
 
 ```
-$ pip install asyncapi[http,yaml,redis,subscriber]
+$ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ```
 
 
@@ -67,14 +69,13 @@ $ pip install asyncapi[http,yaml,redis,subscriber]
 {!./src/api-spec.yaml!}
 ```
 
-
-## Creating subscribers module
+### Creating subscribers module
 
 ```python
 {!./src/user_events.py!}
 ```
 
-## Start subscriber to listen events
+### Start subscriber to listen events
 
 ```bash
 {!./src/subscriber.sh!}
@@ -84,20 +85,83 @@ $ pip install asyncapi[http,yaml,redis,subscriber]
 {!./src/subscriber.output!}
 ```
 
-
-## Publishing Updates
+### Publishing Updates
 
 ```python
 {!./src/publish.py!}
 ```
 
 ```
+python publish.py
+
 {!./src/publish.output!}
 ```
 
-
-## Receive Updates
+### Receive Updates
 
 ```
 {!./src/subscriber-receive-message.output!}
+```
+
+### Expose Specification
+
+
+```bash
+{!./src/docs.sh!}
+```
+
+```bash
+curl -i localhost:5000/asyncapi.yaml
+```
+
+
+## Python Specification Example
+
+```python
+{!./src/specification.py!}
+```
+
+### Creating subscribers module
+
+```python
+{!./src/py_spec_user_events.py!}
+```
+
+### Start subscriber to listen events
+
+```bash
+{!./src/py_spec_subscriber.sh!}
+```
+
+```
+{!./src/subscriber.output!}
+```
+
+### Publishing Updates
+
+```python
+{!./src/py_spec_publish.py!}
+```
+
+```
+python py_spec_publish.py
+
+{!./src/publish.output!}
+```
+
+### Receive Updates
+
+```
+{!./src/subscriber-receive-message.output!}
+```
+
+### Expose Specification
+
+
+```bash
+{!./src/py_spec_docs.sh!}
+```
+
+```bash
+curl -i localhost:5000/asyncapi.yaml
 ```

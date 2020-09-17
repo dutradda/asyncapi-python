@@ -21,15 +21,6 @@ def fake_api_no_operation_id(spec_dict):
     return asyncapi.build_api('fake')
 
 
-@pytest.fixture
-def spec_dict_publish(spec_dict):
-    spec_dict['channels']['fake']['publish'] = spec_dict['channels'][
-        'fake'
-    ].pop('subscribe')
-    spec_dict['channels']['fake']['publish'].pop('operationId')
-    return spec_dict
-
-
 def test_should_get_api(fake_api):
     assert fake_api.spec
     assert fake_api.operations
@@ -74,9 +65,14 @@ async def test_should_build_api_with_channels_subscribers_new_channel(
 
 @pytest.mark.asyncio
 async def test_should_publish_message(
-    fake_api, fake_broadcast, fake_message, mocker, json_message
+    spec_dict_publish,
+    fake_api,
+    fake_broadcast,
+    fake_publish_message,
+    mocker,
+    json_message,
 ):
-    await fake_api.publish('fake', fake_message)
+    await fake_api.publish('fake', fake_publish_message)
 
     assert fake_broadcast.publish.call_args_list == [
         mocker.call(channel='fake', message=json_message.decode())
@@ -99,17 +95,21 @@ async def test_should_listen_message(
 
 
 @pytest.mark.asyncio
-async def test_should_not_publish_for_invalid_message(fake_api, fake_message):
+async def test_should_not_publish_for_invalid_message(
+    fake_api, fake_publish_message
+):
     with pytest.raises(asyncapi.exceptions.InvalidMessageError) as exc_info:
         await fake_api.publish('fake', 'invalid')
 
-    assert exc_info.value.args == ('invalid', type(fake_message))
+    assert exc_info.value.args == ('invalid', type(fake_publish_message))
 
 
 @pytest.mark.asyncio
-async def test_should_not_publish_for_invalid_channel(fake_api, fake_message):
+async def test_should_not_publish_for_invalid_channel(
+    fake_api, fake_publish_message
+):
     with pytest.raises(asyncapi.exceptions.InvalidChannelError) as exc_info:
-        await fake_api.publish('faked', fake_message)
+        await fake_api.publish('faked', fake_publish_message)
 
     assert exc_info.value.args == ('faked',)
 

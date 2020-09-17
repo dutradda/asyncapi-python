@@ -47,13 +47,21 @@ class AutoSpec(Specification):
         message_title: str = '',
         message_summary: str = '',
     ) -> Callable[..., Callable[..., Any]]:
+        if not message_name:
+            message_name = channel_name
+
+        message_name = message_name.replace('/', '_')
+        message_name = message_name.replace('#', '_')
+        message_name = message_name.replace(' ', '_')
+        message_name = as_camel_case(message_name)
+        message_component_name = message_name[0].upper() + message_name[1:]
+
         def decorator(subscbriber: Callable[..., Any]) -> Callable[..., Any]:
             message_type = get_type_hints(subscbriber).get('message')
             message = Message(
-                name=message_name or channel_name,
+                name=message_name,
                 title=message_title,
                 summary=message_summary,
-                content_type='application/json',
                 payload=message_type,
             )
             self.channels[channel_name] = subscbriber.__channel__ = Channel(  # type: ignore
@@ -61,8 +69,20 @@ class AutoSpec(Specification):
                 subscribe=Operation(
                     operation_id=subscbriber.__name__, message=message,
                 ),
+                publish=Operation(message=message),
                 name=channel_name,
             )
+            if self.components and self.components.messages:
+                self.components.messages[message_component_name] = message
+
+            elif self.components:
+                self.components.messages = {message_component_name: message}
+
+            else:
+                self.components = Components(
+                    messages={message_component_name: message}
+                )
+
             return subscbriber
 
         return decorator
@@ -214,3 +234,8 @@ class Channel:
 class Components:
     messages: Optional[Dict[str, Message]] = None
     schemas: Optional[Dict[str, Any]] = None
+
+
+def as_camel_case(snake_str: str) -> str:
+    components = snake_str.split('_')
+    return components[0] + ''.join(x.title() for x in components[1:])

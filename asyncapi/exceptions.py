@@ -52,3 +52,7 @@ class InvalidServerBindingError(AsyncApiError):
 
 class InvalidServerBindingProtocolError(AsyncApiError):
     ...
+
+
+class InvalidChannelsSubscribersError(AsyncApiError):
+    ...

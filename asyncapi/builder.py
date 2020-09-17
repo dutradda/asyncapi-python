@@ -4,7 +4,6 @@ asyncapi
 import importlib
 import io
 from collections import defaultdict, deque
-from functools import partial
 from typing import Any, DefaultDict, Dict, Optional
 
 import requests
@@ -16,6 +15,7 @@ from .api import AsyncApi, OperationsTypeHint
 from .exceptions import (
     EmptyServersError,
     InvalidAsyncApiVersionError,
+    InvalidChannelsSubscribersError,
     InvalidContentTypeError,
     InvalidServerBindingError,
     InvalidServerBindingProtocolError,
@@ -42,9 +42,11 @@ def build_api(
     module_name: str = '',
     republish_errors: bool = True,
     server_bindings: Optional[str] = None,
+    channels_subscribes: Optional[str] = None,
 ) -> AsyncApi:
     spec = build_spec(load_spec_dict(path))
     set_api_spec_server_bindings(spec, server_bindings)
+    set_api_spec_channels_subscribes(spec, channels_subscribes)
     return build_api_from_spec(
         spec, module_name, server, republish_errors, server_bindings,
     )
@@ -108,6 +110,74 @@ def set_api_spec_server_bindings(
                         server.bindings = {protocol: binding}
 
 
+def set_api_spec_channels_subscribes(
+    spec: Specification, channels_subscribes: Optional[str]
+) -> None:
+    if channels_subscribes:
+        channels_subscribes_list = channels_subscribes.split(',')
+        channels_subscribes_dict = {}
+        new_channels = {}
+
+        for channels_subscribes_str in channels_subscribes_list:
+            try:
+                (
+                    publish_channel,
+                    subscribe_operation_id,
+                ) = channels_subscribes_str.split(':')
+            except ValueError:
+                InvalidChannelsSubscribersError(channels_subscribes_str)
+
+            if '=' in subscribe_operation_id:
+                try:
+                    (
+                        subscribe_channel,
+                        subscribe_operation_id,
+                    ) = subscribe_operation_id.split('=')
+                except ValueError:
+                    InvalidChannelsSubscribersError(channels_subscribes_str)
+            else:
+                subscribe_channel = publish_channel
+
+            channels_subscribes_dict[publish_channel] = (
+                subscribe_channel,
+                subscribe_operation_id,
+            )
+
+        for channel_name, channel in spec.channels.items():
+            if (
+                channel.subscribe is None
+                and channel.publish
+                and channel_name in channels_subscribes_dict
+            ):
+                (
+                    subscribe_channel_name,
+                    operation_id,
+                ) = channels_subscribes_dict[channel_name]
+                subscribe = Operation(
+                    operation_id=operation_id,
+                    summary=channel.publish.summary,
+                    description=channel.publish.description,
+                    tags=channel.publish.tags,
+                    external_docs=channel.publish.external_docs,
+                    bindings=channel.publish.bindings,
+                    traits=channel.publish.traits,
+                    message=channel.publish.message,
+                )
+
+                if subscribe_channel_name == channel_name:
+                    channel.subscribe = subscribe
+                else:
+                    new_channels[subscribe_channel_name] = Channel(
+                        description=channel.description,
+                        subscribe=subscribe,
+                        parameters=channel.parameters,
+                        bindings=channel.bindings,
+                        name=subscribe_channel_name,
+                    )
+
+        spec.channels.update(new_channels)
+
+
 def build_api_from_spec(
     spec: Specification,
     module_name: str,
@@ -153,15 +223,7 @@ def build_channel_operations(
 ) -> OperationsTypeHint:
     if module_name:
         return {
-            (channel_name, channel.subscribe.operation_id): partial(
-                getattr(
-                    importlib.import_module(module_name),
-                    channel.subscribe.operation_id,
-                ),
-                bindings=channel.bindings,
-            )
-            if channel.bindings
-            else getattr(
+            (channel_name, channel.subscribe.operation_id): getattr(
                 importlib.import_module(module_name),
                 channel.subscribe.operation_id,
             )
@@ -264,11 +326,6 @@ def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
     channels = {}
 
     for channel_name, channel_spec in spec['channels'].items():
-        content_type = channel_spec['subscribe']['message'].get('contentType')
-
-        if content_type:
-            validate_content_type(content_type)
-
         channels[channel_name] = Channel(
             name=channel_name,
             subscribe=build_operation(channel_spec.pop('subscribe', None)),
@@ -294,11 +351,13 @@ def build_operation(
 
 
 def build_message(message_spec: Dict[str, Any]) -> Message:
-    if message_spec is None:
-        return None
+    content_type = message_spec.get('contentType')
+
+    if content_type:
+        validate_content_type(content_type)
 
     return Message(
-        content_type=message_spec.get('contentType'),
+        content_type=content_type,
         payload=jsonschema_asdataclass(
             message_spec['name'].replace(' ', ''),
             message_spec.get('payload', {}),

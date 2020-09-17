@@ -26,6 +26,9 @@ def main(
     ),
     channel: Optional[str] = typer.Option(None, envvar='ASYNCAPI_CHANNEL'),
     workers: int = typer.Option(1, envvar='ASYNCAPI_WORKERS'),
+    channels_subscribes: Optional[str] = typer.Option(
+        None, envvar='ASYNCAPI_CHANNELS_SUBSCRIBES'
+    ),
 ) -> None:
 
     if url is None:
@@ -46,6 +49,7 @@ def main(
             module_name=api_module,
             server_bindings=server_bindings,
             republish_errors=republish_errors,
+            channels_subscribes=channels_subscribes,
         )
 
     fork_app(workers)

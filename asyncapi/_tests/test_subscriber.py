@@ -26,6 +26,7 @@ async def test_should_run_subscriber_for_spec(fake_loop):
         api_module='asyncapi._tests',
         channel=None,
         server_bindings=None,
+        channels_subscribes=None,
         workers=2,
     )
     await fake_loop.create_task.call_args_list[0][0][0]
@@ -42,6 +43,7 @@ async def test_should_run_subscriber_for_auto_spec(fake_loop):
         url=None,
         server=None,
         workers=2,
+        channels_subscribes=None,
     )
     await fake_loop.create_task.call_args_list[0][0][0]
 
@@ -57,4 +59,5 @@ def test_should_raise_url_or_module_required_error():
             server=None,
             api_module=None,
             workers=2,
+            channels_subscribes=None,
         )

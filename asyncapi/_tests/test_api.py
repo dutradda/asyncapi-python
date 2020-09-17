@@ -21,6 +21,15 @@ def fake_api_no_operation_id(spec_dict):
     return asyncapi.build_api('fake')
 
 
+@pytest.fixture
+def spec_dict_publish(spec_dict):
+    spec_dict['channels']['fake']['publish'] = spec_dict['channels'][
+        'fake'
+    ].pop('subscribe')
+    spec_dict['channels']['fake']['publish'].pop('operationId')
+    return spec_dict
+
+
 def test_should_get_api(fake_api):
     assert fake_api.spec
     assert fake_api.operations
@@ -35,6 +44,32 @@ async def test_should_build_api_with_servers_bindings(
     assert fake_broadcast_cls.call_args_list == [
         mocker.call('kafka://fake.fake?option1=0.1&option2=0')
     ]
+
+
+@pytest.mark.asyncio
+async def test_should_build_api_with_channels_subscribers(
+    mocker, spec_dict_publish
+):
+    api = asyncapi.build_api('fake', channels_subscribes='fake:fake_operation')
+
+    assert api.spec.channels['fake'].publish
+    assert api.spec.channels['fake'].subscribe.operation_id == 'fake_operation'
+
+
+@pytest.mark.asyncio
+async def test_should_build_api_with_channels_subscribers_new_channel(
+    mocker, spec_dict_publish
+):
+    api = asyncapi.build_api(
+        'fake', channels_subscribes='fake:fake-subscription=fake_operation'
+    )
+
+    assert api.spec.channels['fake'].publish
+    assert not api.spec.channels['fake'].subscribe
+    assert (
+        api.spec.channels['fake-subscription'].subscribe.operation_id
+        == 'fake_operation'
+    )
 
 
 @pytest.mark.asyncio

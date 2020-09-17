@@ -2,11 +2,12 @@ HTTP/1.1 200 OK
 date: ...
 server: uvicorn
 content-type: application/x-yaml
-content-length: 651
+content-length: 833
 
 asyncapi: 2.0.0
 channels:
   user/update:
+    description: Topic for user updates
     publish:
       message:
         $ref: '#/components/messages/UserUpdate'
@@ -29,11 +30,15 @@ components:
         required:
         - id
         type: object
+      summary: Inform about users updates
+      title: User Update
 defaultContentType: application/json
 info:
-  title: User Events
+  description: API do manage users
+  title: User API
   version: 1.0.0
 servers:
   development:
+    description: Development Broker Server
     protocol: redis
     url: localhost

@@ -260,33 +260,94 @@ without code generation.
     Specification Example
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Specification Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#creating-subscribers-module" class="md-nav__link">
     Creating subscribers module
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#start-subscriber-to-listen-events" class="md-nav__link">
     Start subscriber to listen events
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#publishing-updates" class="md-nav__link">
     Publishing Updates
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#receive-updates" class="md-nav__link">
     Receive Updates
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expose-specification" class="md-nav__link">
+    Expose Specification
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-specification-example" class="md-nav__link">
+    Python Specification Example
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Specification Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-subscribers-module_1" class="md-nav__link">
+    Creating subscribers module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-subscriber-to-listen-events_1" class="md-nav__link">
+    Start subscriber to listen events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-updates_1" class="md-nav__link">
+    Publishing Updates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#receive-updates_1" class="md-nav__link">
+    Receive Updates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expose-specification_1" class="md-nav__link">
+    Expose Specification
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -396,33 +457,94 @@ without code generation.
     Specification Example
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Specification Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#creating-subscribers-module" class="md-nav__link">
     Creating subscribers module
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#start-subscriber-to-listen-events" class="md-nav__link">
     Start subscriber to listen events
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#publishing-updates" class="md-nav__link">
     Publishing Updates
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#receive-updates" class="md-nav__link">
     Receive Updates
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expose-specification" class="md-nav__link">
+    Expose Specification
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-specification-example" class="md-nav__link">
+    Python Specification Example
+  </a>
+  
+    <nav class="md-nav" aria-label="Python Specification Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#creating-subscribers-module_1" class="md-nav__link">
+    Creating subscribers module
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-subscriber-to-listen-events_1" class="md-nav__link">
+    Start subscriber to listen events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-updates_1" class="md-nav__link">
+    Publishing Updates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#receive-updates_1" class="md-nav__link">
+    Receive Updates
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expose-specification_1" class="md-nav__link">
+    Expose Specification
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -465,6 +587,9 @@ without code generation.
 <p><strong>Reads an asyncapi specification and create publishers and subscribers from it</strong></p>
 </li>
 <li>
+<p><strong>Support for specification declaration with dataclasses</strong></p>
+</li>
+<li>
 <p><strong>Provides application for create subscribers</strong></p>
 </li>
 <li>
@@ -499,7 +624,7 @@ without code generation.
 </li>
 </ul>
 <h2 id="installation">Installation</h2>
-<div class="codehilite"><pre><span></span><code>$ pip install asyncapi[http,yaml,redis,subscriber]
+<div class="codehilite"><pre><span></span><code>$ pip install asyncapi[http,yaml,redis,subscriber,docs]
 </code></pre></div>
 
 
@@ -523,26 +648,34 @@ without code generation.
     <span class="nt">subscribe</span><span class="p">:</span>
       <span class="nt">operationId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">receive_user_update</span>
       <span class="nt">message</span><span class="p">:</span>
-        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">userUpdate</span>
-        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">User Update</span>
-        <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Inform about users updates</span>
-        <span class="nt">payload</span><span class="p">:</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-          <span class="nt">required</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
-          <span class="nt">properties</span><span class="p">:</span>
-            <span class="nt">id</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">name</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-            <span class="nt">age</span><span class="p">:</span>
-              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
+        <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/messages/UserUpdate&#39;</span>
+    <span class="nt">publish</span><span class="p">:</span>
+      <span class="nt">message</span><span class="p">:</span>
+        <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/messages/UserUpdate&#39;</span>
+
+<span class="nt">components</span><span class="p">:</span>
+  <span class="nt">messages</span><span class="p">:</span>
+    <span class="nt">UserUpdate</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">userUpdate</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">User Update</span>
+      <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Inform about users updates</span>
+      <span class="nt">payload</span><span class="p">:</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">required</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">id</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">name</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">age</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
 
 <span class="nt">defaultContentType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">application/json</span>
 </code></pre></div>
 
 
-<h2 id="creating-subscribers-module">Creating subscribers module</h2>
+<h3 id="creating-subscribers-module">Creating subscribers module</h3>
 <div class="codehilite"><pre><span></span><code><span class="c1"># user_events.py</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
@@ -553,7 +686,7 @@ without code generation.
 </code></pre></div>
 
 
-<h2 id="start-subscriber-to-listen-events">Start subscriber to listen events</h2>
+<h3 id="start-subscriber-to-listen-events">Start subscriber to listen events</h3>
 <div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber <span class="se">\</span>
     --url api-spec.yaml <span class="se">\</span>
     --api-module user_events
@@ -564,7 +697,7 @@ without code generation.
 </code></pre></div>
 
 
-<h2 id="publishing-updates">Publishing Updates</h2>
+<h3 id="publishing-updates">Publishing Updates</h3>
 <div class="codehilite"><pre><span></span><code><span class="c1"># publish.py</span>
 
 <span class="kn">import</span> <span class="nn">asyncio</span>
@@ -588,13 +721,140 @@ without code generation.
 </code></pre></div>
 
 
-<div class="codehilite"><pre><span></span><code>Published update for user=fake-user
+<div class="codehilite"><pre><span></span><code>python publish.py
+
+Published update for user=fake-user
 </code></pre></div>
 
 
-<h2 id="receive-updates">Receive Updates</h2>
+<h3 id="receive-updates">Receive Updates</h3>
 <div class="codehilite"><pre><span></span><code>Waiting messages...
 Received update for user id=fake-user
+</code></pre></div>
+
+
+<h3 id="expose-specification">Expose Specification</h3>
+<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-docs --path api-spec.yaml
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>curl -i localhost:5000/asyncapi.yaml
+</code></pre></div>
+
+
+<h2 id="python-specification-example">Python Specification Example</h2>
+<div class="codehilite"><pre><span></span><code><span class="c1"># specification.py</span>
+
+<span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">asyncapi</span>
+
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span> <span class="nc">UserUpdatePayload</span><span class="p">:</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">age</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="n">dev_server</span> <span class="o">=</span> <span class="n">asyncapi</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span>
+    <span class="n">url</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+    <span class="n">protocol</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">ProtocolType</span><span class="o">.</span><span class="n">REDIS</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Development Broker Server&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">asyncapi</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;userUpdate&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;User Update&#39;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s1">&#39;Inform about users updates&#39;</span><span class="p">,</span>
+    <span class="n">payload</span><span class="o">=</span><span class="n">UserUpdatePayload</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">user_update_channel</span> <span class="o">=</span> <span class="n">asyncapi</span><span class="o">.</span><span class="n">Channel</span><span class="p">(</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Topic for user updates&#39;</span><span class="p">,</span>
+    <span class="n">subscribe</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">Operation</span><span class="p">(</span>
+        <span class="n">operation_id</span><span class="o">=</span><span class="s1">&#39;receive_user_update&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">publish</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">Operation</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">spec</span> <span class="o">=</span> <span class="n">asyncapi</span><span class="o">.</span><span class="n">Specification</span><span class="p">(</span>
+    <span class="n">info</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;User API&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;API do manage users&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">servers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;development&#39;</span><span class="p">:</span> <span class="n">dev_server</span><span class="p">},</span>
+    <span class="n">channels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user/update&#39;</span><span class="p">:</span> <span class="n">user_update_channel</span><span class="p">},</span>
+    <span class="n">components</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">Components</span><span class="p">(</span><span class="n">messages</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;UserUpdate&#39;</span><span class="p">:</span> <span class="n">message</span><span class="p">}),</span>
+<span class="p">)</span>
+</code></pre></div>
+
+
+<h3 id="creating-subscribers-module_1">Creating subscribers module</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># py_spec_user_events.py</span>
+
+<span class="kn">import</span> <span class="nn">specification</span>
+
+
+<span class="n">spec</span> <span class="o">=</span> <span class="n">specification</span><span class="o">.</span><span class="n">spec</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">receive_user_update</span><span class="p">(</span>
+    <span class="n">message</span><span class="p">:</span> <span class="n">specification</span><span class="o">.</span><span class="n">UserUpdatePayload</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received update for user id=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<h3 id="start-subscriber-to-listen-events_1">Start subscriber to listen events</h3>
+<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber --api-module py_spec_user_events
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>Waiting messages...
+</code></pre></div>
+
+
+<h3 id="publishing-updates_1">Publishing Updates</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># py_spec_publish.py</span>
+
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">build_api_auto_spec</span>
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">build_api_auto_spec</span><span class="p">(</span><span class="s1">&#39;specification&#39;</span><span class="p">)</span>
+<span class="n">channel_id</span> <span class="o">=</span> <span class="s1">&#39;user/update&#39;</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">payload</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;fake-user&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Fake User&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Published update for user=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>python py_spec_publish.py
+
+Published update for user=fake-user
+</code></pre></div>
+
+
+<h3 id="receive-updates_1">Receive Updates</h3>
+<div class="codehilite"><pre><span></span><code>Waiting messages...
+Received update for user id=fake-user
+</code></pre></div>
+
+
+<h3 id="expose-specification_1">Expose Specification</h3>
+<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-docs --api-module specification
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>curl -i localhost:5000/asyncapi.yaml
 </code></pre></div>
                 
               

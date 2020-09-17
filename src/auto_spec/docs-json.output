@@ -2,50 +2,58 @@ HTTP/1.1 200 OK
 date: ...
 server: uvicorn
 content-type: application/json
-content-length: 907
+content-length: 1014
 
 {
   "info": {
     "title": "User Events",
-    "version": "1.0.0",
-    "description": ""
+    "version": "1.0.0"
+  },
+  "channels": {
+    "user/update": {
+      "publish": {
+        "message": {
+          "$ref": "#/components/messages/UserUpdate"
+        }
+      },
+      "subscribe": {
+        "operationId": "receive_user_update",
+        "message": {
+          "$ref": "#/components/messages/UserUpdate"
+        }
+      }
+    }
   },
   "servers": {
     "development": {
       "url": "localhost",
-      "protocol": "redis",
-      "description": ""
+      "protocol": "redis"
     }
   },
-  "channels": {
-    "user/update": {
-      "description": "",
-      "subscribe": {
-        "message": {
-          "name": "user/update",
-          "title": "",
-          "summary": "",
-          "payload": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "age": {
-                "type": "integer"
-              }
+  "components": {
+    "messages": {
+      "UserUpdate": {
+        "payload": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
             },
-            "required": [
-              "id"
-            ]
-          }
+            "name": {
+              "type": "string"
+            },
+            "age": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id"
+          ]
         },
-        "operationId": "receive_user_update"
+        "name": "userUpdate"
       }
     }
   },
-  "defaultContentType": "application/json"
+  "defaultContentType": "application/json",
+  "asyncapi": "2.0.0"
 }

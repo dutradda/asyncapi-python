@@ -393,10 +393,10 @@ without code generation.
 <span class="kn">import</span> <span class="nn">dataclasses</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">Spec</span>
+<span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">AutoSpec</span>
 
 
-<span class="n">spec</span> <span class="o">=</span> <span class="n">Spec</span><span class="p">(</span><span class="s1">&#39;User Events&#39;</span><span class="p">,</span> <span class="n">development</span><span class="o">=</span><span class="s1">&#39;redis://localhost&#39;</span><span class="p">)</span>
+<span class="n">spec</span> <span class="o">=</span> <span class="n">AutoSpec</span><span class="p">(</span><span class="s1">&#39;User Events&#39;</span><span class="p">,</span> <span class="n">development</span><span class="o">=</span><span class="s1">&#39;redis://localhost&#39;</span><span class="p">)</span>
 
 
 <span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>

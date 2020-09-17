@@ -411,6 +411,8 @@ INFO:     Waiting for application startup.
 INFO:     ASGI &#39;lifespan&#39; protocol appears unsupported.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [...]
 </code></pre></div>
 
 
@@ -440,7 +442,7 @@ INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
 <span class="kn">from</span> <span class="nn">asyncapi</span> <span class="kn">import</span> <span class="n">build_api</span>
 
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">build_api</span><span class="p">(</span><span class="s1">&#39;http://localhost:5000/asyncapi.json&#39;</span><span class="p">)</span>
+<span class="n">api</span> <span class="o">=</span> <span class="n">build_api</span><span class="p">(</span><span class="s1">&#39;http://localhost:5000/asyncapi.yaml&#39;</span><span class="p">)</span>
 <span class="n">channel_id</span> <span class="o">=</span> <span class="s1">&#39;user/update&#39;</span>
 <span class="n">message</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">payload</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;fake-user&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Fake User&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">33</span><span class="p">)</span>
 

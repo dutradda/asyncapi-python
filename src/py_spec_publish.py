@@ -1,11 +1,11 @@
-# publish.py
+# py_spec_publish.py
 
 import asyncio
 
-from asyncapi import build_api
+from asyncapi import build_api_auto_spec
 
 
-api = build_api('http://localhost:5000/asyncapi.yaml')
+api = build_api_auto_spec('specification')
 channel_id = 'user/update'
 message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 

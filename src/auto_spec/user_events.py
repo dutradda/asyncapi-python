@@ -3,10 +3,10 @@
 import dataclasses
 from typing import Optional
 
-from asyncapi import Spec
+from asyncapi import AutoSpec
 
 
-spec = Spec('User Events', development='redis://localhost')
+spec = AutoSpec('User Events', development='redis://localhost')
 
 
 @dataclasses.dataclass

@@ -1,25 +1,10 @@
 #!/usr/bin/env bats
 
 
-@test "should serve docs http auto spec" {
-    cd docs/src/auto_spec
-    sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
-        ./docs.sh > /tmp/asyncapi-docs.sh
-    bash /tmp/asyncapi-docs.sh > /tmp/asyncapi-docs.log 2>&1 &
-    sleep 1
-    ps ax | grep 'asyncapi.docs' | \
-        grep -v -E 'bats|grep' | sed -r -e 's/ ?([0-9]+) .*/\1/g' | \
-        xargs kill -SIGTERM 2>/dev/null
-    sleep 1
-    sed -i -r -e 's/process \[([0-9]+)\]/process [...]/g' /tmp/asyncapi-docs.log
-    [ "$(cat /tmp/asyncapi-docs.log)" = "$(cat docs.output)" ]
-}
-
-
 @test "should request yaml http auto spec" {
-    cd docs/src/auto_spec
+    cd docs/src/expose_docs
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
-        ./docs.sh > /tmp/asyncapi-docs.sh
+        ../auto_spec/module/docs.sh > /tmp/asyncapi-docs.sh
     bash /tmp/asyncapi-docs.sh > /tmp/asyncapi-docs.log 2>&1 &
     sleep 2
     curl -i localhost:5000/asyncapi.yml \
@@ -30,20 +15,20 @@
         xargs kill -SIGTERM 2>/dev/null
     sleep 1
     sed -i -r -e 's/date: .*/date: .../g' /tmp/asyncapi-docs-yaml.log
-    [ "$(cat /tmp/asyncapi-docs-yaml.log)" = "$(cat docs-yaml.output)" ] || (\
+    [ "$(cat /tmp/asyncapi-docs-yaml.log)" = "$(cat ../auto_spec/module/docs-yaml.output)" ] || (\
         echo -e "\n\n\nServer Output (/tmp/asyncapi-docs.log):" && \
         cat /tmp/asyncapi-docs.log && \
         echo -e "\n\n\nEndpoint Output (/tmp/asyncapi-docs-yaml.log):" && \
         cat /tmp/asyncapi-docs-yaml.log \
     )
-    [ "$(cat /tmp/asyncapi-docs-yaml.log)" = "$(cat docs-yaml.output)" ]
+    [ "$(cat /tmp/asyncapi-docs-yaml.log)" = "$(cat ../auto_spec/module/docs-yaml.output)" ]
 }
 
 
 @test "should request json http auto spec" {
-    cd docs/src/auto_spec
+    cd docs/src/expose_docs
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
-        ./docs.sh > /tmp/asyncapi-docs.sh
+        ../auto_spec/module/docs.sh > /tmp/asyncapi-docs.sh
     bash /tmp/asyncapi-docs.sh > /tmp/asyncapi-docs.log 2>&1 &
     sleep 2
     curl -i localhost:5000/asyncapi.json \
@@ -64,9 +49,9 @@
 
 
 @test "should publish message http auto spec" {
-    cd docs/src/auto_spec
+    cd docs/src/expose_docs
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
-        ./docs.sh > /tmp/asyncapi-docs.sh
+        ../auto_spec/module/docs.sh > /tmp/asyncapi-docs.sh
     bash /tmp/asyncapi-docs.sh > /tmp/asyncapi-docs.log 2>&1 &
     sleep 1
     run coverage run -p publish_http.py
@@ -80,9 +65,9 @@
 
 
 @test "should receive message http auto spec" {
-    cd docs/src/auto_spec
+    cd docs/src/expose_docs
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
-        ./docs.sh > /tmp/asyncapi-docs.sh
+        ../auto_spec/module/docs.sh > /tmp/asyncapi-docs.sh
     bash /tmp/asyncapi-docs.sh > /tmp/asyncapi-docs.log 2>&1 &
     sleep 1
     sed -r -e "s/asyncapi-subscriber/coverage run -p -m 'asyncapi.subscriber'/" \

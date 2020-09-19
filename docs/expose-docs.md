@@ -1,42 +1,38 @@
 # Serving the AsyncAPI Docs
 
-## Serve docs from an already created spec
+### Serve docs from an already created spec
 
 ```bash
-{!./src/auto_spec/docs.sh!}
+{!./src/auto_spec/module/docs.sh!}
 ```
 
 ```
-{!./src/auto_spec/docs.output!}
+{!./src/docs-server.output!}
 ```
 
-
-## Create subscriber module
+### Create subscriber module
 
 ```python
-{!./src/auto_spec/user_events_http.py!}
+{!./src/expose_docs/user_events_http.py!}
 ```
 
-
-## Start subscriber to listen events from exposed spec
+### Start subscriber to listen events from exposed spec
 
 ```bash
-{!./src/auto_spec/subscriber-http.sh!}
+{!./src/expose_docs/subscriber-http.sh!}
 ```
 
-
-## Publishing updates from exposed spec
+### Publishing updates from exposed spec
 
 ```python
-{!./src/auto_spec/publish_http.py!}
+{!./src/expose_docs/publish_http.py!}
 ```
 
 ```
 {!./src/publish.output!}
 ```
 
-
-## Receive Updates
+### Receive Updates
 
 ```
 {!./src/subscriber-receive-message.output!}

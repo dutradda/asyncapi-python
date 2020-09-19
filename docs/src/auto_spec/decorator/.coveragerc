@@ -1,0 +1,12 @@
+[run]
+source =
+    asyncapi
+    .
+omit =
+    */test_*.py
+    *conftest.py
+    *venv*
+    */_tests/**
+
+[report]
+show_missing = True

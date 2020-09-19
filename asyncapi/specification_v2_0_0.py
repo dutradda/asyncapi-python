@@ -40,6 +40,7 @@ class AutoSpec(Specification):
 
     def subscribe(
         self,
+        subscbriber_: Optional[Callable[..., Any]] = None,
         *,
         channel_name: str,
         channel_description: str = '',
@@ -85,7 +86,10 @@ class AutoSpec(Specification):
 
             return subscbriber
 
-        return decorator
+        if subscbriber_:
+            return decorator(subscbriber_)
+        else:
+            return decorator
 
 
 @dataclass

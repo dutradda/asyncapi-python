@@ -23,7 +23,9 @@ nav:
       - HTTP Specification: gcloud-pubsub/http-specification.md
       - Python Specification: gcloud-pubsub/python-specification.md
       - PubSub Server Bindings: gcloud-pubsub/server-bindings.md
-    - Automatic Specification Declaration: auto-spec.md
+    - Auto Spec Tutorial:
+      - Specification module: auto-spec/module.md
+      - Specification decorator: auto-spec/decorator.md
     - Development - Contributing: contributing.md
     - Changelog: changelog.md
 

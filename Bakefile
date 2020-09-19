@@ -21,7 +21,8 @@ coverage: //check-virtualenv
     coverage combine .coverage.* \
         docs/src/yaml_spec/.coverage.* \
         docs/src/python_spec/.coverage.* \
-        docs/src/auto_spec/.coverage.* \
+        docs/src/auto_spec/module/.coverage.* \
+        docs/src/expose_docs/.coverage.* \
         docs/src/gcloud_pubsub/.coverage.*
     coverage report
     coverage xml
@@ -47,11 +48,14 @@ tests-docs-index-yaml-spec:
 tests-docs-index-python-spec:
     bats docs/src/python_spec
 
-tests-docs-auto-spec-python:
-    bats docs/src/auto_spec/python_spec
+tests-docs-auto-spec-module:
+    bats docs/src/auto_spec/module
 
-tests-docs-auto-spec-http:
-    bats docs/src/auto_spec/http_spec
+tests-docs-auto-spec-decorator:
+    bats docs/src/auto_spec/decorator
+
+tests-docs-expose-docs:
+    bats docs/src/expose_docs
 
 tests-docs-pubsub-http-spec:
     bats docs/src/gcloud_pubsub/http_spec
@@ -62,8 +66,8 @@ tests-docs-pubsub-python-spec:
 tests-docs-pubsub-server-bindings:
     bats docs/src/gcloud_pubsub/server_bindings
 
-tests-docs: tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+tests-docs: tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
 
-tests: tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+tests: tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
 
-integration: check-code tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings coverage
+integration: check-code tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings coverage

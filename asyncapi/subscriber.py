@@ -40,6 +40,7 @@ def main(
             server=server,
             server_bindings=server_bindings,
             republish_errors=republish_errors,
+            channels_subscribes=channels_subscribes,
         )
 
     else:
@@ -63,7 +64,7 @@ def start(
     loop: AbstractEventLoop, api: AsyncApi, channel: Optional[str]
 ) -> None:
     async def init() -> None:
-        await api.broadcast.connect()
+        await api.connect()
 
         if channel is None:
             await api.listen_all()

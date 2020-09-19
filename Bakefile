@@ -18,6 +18,24 @@ setup-asyncapi: //check-virtualenv
     pip install --force-reinstall git+https://github.com/pycqa/pyflakes
 
 coverage: //check-virtualenv
-    coverage combine .coverage.* docs/src/.coverage.* docs/src/auto_spec/.coverage.*
+    coverage combine .coverage.* \
+        docs/src/.coverage.* \
+        docs/src/auto_spec/.coverage.* \
+        docs/src/gcloud_pubsub/.coverage.*
     coverage report
     coverage xml
+
+docker:
+    docker-compose up -d
+
+docker-pubsub:
+    docker-compose up pubsub pubsub-init
+
+docker-kafka:
+    docker-compose up kafka
+
+docker-down:
+    docker-compose down
+
+docker-logs:
+    docker-compose up

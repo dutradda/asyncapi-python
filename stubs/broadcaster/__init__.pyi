@@ -2,7 +2,10 @@ from typing import Any, Dict, AsyncGenerator, AsyncContextManager
 
 
 class Event:
-    message: str
+    channel: str
+    message: Any
+
+    def __init__(self, channel: str, message: Any): ...
 
 
 class Broadcast:
@@ -15,3 +18,5 @@ class Broadcast:
     ) -> AsyncContextManager[AsyncGenerator[Event, None]]: ...
 
     async def connect(self) -> None: ...
+
+    async def disconnect(self) -> None: ...

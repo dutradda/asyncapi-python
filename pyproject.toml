@@ -65,6 +65,9 @@ subscriber = [
 docs = [
     'apidaora'
 ]
+gcloud-pubsub = [
+    'google-cloud-pubsub>=1,<2'
+]
 
 [tool.flit.sdist]
 exclude = [

@@ -33,6 +33,8 @@
 
 - **Support for kafka, redis and postgres protocols (same as broadcaster library)**
 
+- **Extra support for google cloud pubsub service**
+
 - **Expose in http the auto-generated specification**
 
 
@@ -54,6 +56,7 @@
     + postgres
     + subscriber
     + docs
+    + google-cloud-pubsub
 
 
 ## Installation

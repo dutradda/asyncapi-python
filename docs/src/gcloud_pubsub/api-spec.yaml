@@ -7,17 +7,13 @@ info:
 
 servers:
   development:
-    url: localhost
-    protocol: redis
+    url: asyncapi-local
+    protocol: gcloud-pubsub
     description: Development Broker Server
 
 channels:
-  user/update:
+  user-update:
     description: Topic for user updates
-    subscribe:
-      operationId: receive_user_update
-      message:
-        $ref: '#/components/messages/UserUpdate'
     publish:
       message:
         $ref: '#/components/messages/UserUpdate'

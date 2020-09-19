@@ -1,5 +1,11 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Create EventsHandler class from broadcaster lib
+
+ - Add support for Google Cloud Platform PubSub service
+
 ### 0.8.0 - 2020-09-17
 
  - Improve specification exposition

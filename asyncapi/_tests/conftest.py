@@ -81,19 +81,21 @@ def fake_yaml(mocker, spec_dict):
 
 
 @pytest.fixture(autouse=True)
-def fake_broadcast_cls(json_message, mocker, async_iterator):
-    return mocker.patch.object(asyncapi.builder, 'Broadcast')
+def fake_events_handler_cls(json_message, mocker, async_iterator):
+    return mocker.patch.object(asyncapi.builder, 'EventsHandler')
 
 
 @pytest.fixture(autouse=True)
-def fake_broadcast(fake_broadcast_cls, json_message, mocker, async_iterator):
-    broadcast = fake_broadcast_cls.return_value
-    broadcast.publish = asynctest.CoroutineMock()
-    broadcast.connect = asynctest.CoroutineMock()
-    broadcast.subscribe.return_value = async_iterator(
+def fake_events_handler(
+    fake_events_handler_cls, json_message, mocker, async_iterator
+):
+    events_handler = fake_events_handler_cls.return_value
+    events_handler.publish = asynctest.CoroutineMock()
+    events_handler.connect = asynctest.CoroutineMock()
+    events_handler.subscribe.return_value = async_iterator(
         [mocker.MagicMock(message=json_message)]
     )
-    return broadcast
+    return events_handler
 
 
 @pytest.fixture

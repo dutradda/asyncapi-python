@@ -34,7 +34,7 @@ components:
       title: User Update
 defaultContentType: application/json
 info:
-  description: API do manage users
+  description: API to manage users
   title: User API
   version: 1.0.0
 servers:

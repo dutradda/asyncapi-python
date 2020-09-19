@@ -33,6 +33,8 @@
 
 - **Support for kafka, redis and postgres protocols (same as broadcaster library)**
 
+- **Extra support for google cloud pubsub service**
+
 - **Expose in http the auto-generated specification**
 
 
@@ -54,6 +56,7 @@
     + postgres
     + subscriber
     + docs
+    + google-cloud-pubsub
 
 
 ## Installation
@@ -71,7 +74,7 @@ asyncapi: 2.0.0
 info:
   title: User API
   version: '1.0.0'
-  description: API do manage users
+  description: API to manage users
 
 servers:
   development:
@@ -157,6 +160,7 @@ message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 async def publish() -> None:
     await api.connect()
     await api.publish(channel_id, message)
+    await api.disconnect()
 
 
 asyncio.run(publish())
@@ -184,7 +188,7 @@ Received update for user id=fake-user
 
 
 ```bash
-PYTHONPATH=. asyncapi-docs --path api-spec.yaml
+asyncapi-docs --path api-spec.yaml
 
 ```
 
@@ -232,7 +236,7 @@ user_update_channel = asyncapi.Channel(
 
 spec = asyncapi.Specification(
     info=asyncapi.Info(
-        title='User API', version='1.0.0', description='API do manage users',
+        title='User API', version='1.0.0', description='API to manage users',
     ),
     servers={'development': dev_server},
     channels={'user/update': user_update_channel},
@@ -289,6 +293,7 @@ message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 async def publish() -> None:
     await api.connect()
     await api.publish(channel_id, message)
+    await api.disconnect()
 
 
 asyncio.run(publish())

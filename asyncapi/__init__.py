@@ -12,6 +12,8 @@ from .builder import (
     dict_from_ref,
     fill_refs,
 )
+from .events import Event
+from .events.handler import EventsHandler
 from .exceptions import (
     ChannelOperationNotFoundError,
     InvalidChannelError,
@@ -61,4 +63,6 @@ __all__ = [
     'UrlOrModuleRequiredError',
     'run_subscriber',
     'run_docs',
+    'EventsHandler',
+    'Event',
 ]

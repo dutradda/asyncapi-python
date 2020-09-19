@@ -4,9 +4,9 @@ import logging
 from typing import Any, Callable, Dict, Tuple, Type
 
 import orjson
-from broadcaster import Broadcast
 from jsondaora import DeserializationError, asdataclass, dataclass_asjson
 
+from .events.handler import EventsHandler
 from .exceptions import (
     ChannelOperationNotFoundError,
     ChannelPublishNotFoundError,
@@ -24,14 +24,14 @@ OperationsTypeHint = Dict[Tuple[str, str], Callable[..., Any]]
 class AsyncApi:
     spec: Specification
     operations: OperationsTypeHint
-    broadcast: Broadcast
+    events_handler: EventsHandler
     republish_error_messages: bool = True
     logger: logging.Logger = logging.getLogger(__name__)
 
     async def publish_json(
         self, channel_id: str, message: Dict[str, Any]
     ) -> None:
-        await self.broadcast.publish(
+        await self.events_handler.publish(
             channel=channel_id,
             message=self.parse_message(
                 channel_id, self.payload(channel_id, **message)
@@ -39,13 +39,16 @@ class AsyncApi:
         )
 
     async def publish(self, channel_id: str, message: Any) -> None:
-        await self.broadcast.publish(
+        await self.events_handler.publish(
             channel=channel_id,
             message=self.parse_message(channel_id, message).decode(),
         )
 
     async def connect(self) -> None:
-        await self.broadcast.connect()
+        await self.events_handler.connect()
+
+    async def disconnect(self) -> None:
+        await self.events_handler.disconnect()
 
     def payload(self, channel_id: str, **message: Any) -> Any:
         type_ = self.publish_payload_type(channel_id)
@@ -66,10 +69,11 @@ class AsyncApi:
     async def listen_all(self) -> None:
         tasks = []
 
-        for channel_id in self.spec.channels.keys():
-            task = asyncio.create_task(self.listen(channel_id))
-            task.add_done_callback(task_callback)
-            tasks.append(task)
+        for channel_id, channel in self.spec.channels.items():
+            if channel.subscribe:
+                task = asyncio.create_task(self.listen(channel_id))
+                task.add_done_callback(task_callback)
+                tasks.append(task)
 
         await asyncio.gather(*tasks)
 
@@ -82,7 +86,9 @@ class AsyncApi:
         if operation_id is None:
             raise ChannelOperationNotFoundError(channel_id)
 
-        async with self.broadcast.subscribe(channel=channel_id) as subscriber:
+        async with self.events_handler.subscribe(
+            channel=channel_id
+        ) as subscriber:
             async for event in subscriber:
                 try:
                     json_message = orjson.loads(event.message)

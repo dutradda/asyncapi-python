@@ -1,0 +1,8 @@
+FROM python:slim
+
+RUN pip install -U pip && \
+    pip install 'google-cloud-pubsub<2'
+
+ADD pubsub_init.py /pubsub_init.py
+
+ENTRYPOINT python /pubsub_init.py

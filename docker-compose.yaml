@@ -1,0 +1,39 @@
+version: '3'
+services:
+  kafka:
+    image: krisgeus/docker-kafka
+    hostname: kafka
+    ports:
+    - 2181:2181
+    - 9092:9092
+    - 9093:9093
+    environment:
+      - ADVERTISED_LISTENERS=INTERNAL://localhost:9093
+      - LISTENERS=PLAINTEXT://0.0.0.0:9092,INTERNAL://0.0.0.0:9093
+      - SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
+      - INTER_BROKER=INTERNAL
+      - KAFKA_CREATE_TOPICS=chatroom:36:1
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+
+  pubsub:
+    image: google/cloud-sdk
+    entrypoint: |
+      gcloud beta emulators pubsub start
+      --data-dir=/root/
+      --host-port=0.0.0.0:8086
+      --project=asyncapi-local
+    ports:
+      - "8086:8086"
+
+  pubsub-init:
+    build:
+      context: bin
+      dockerfile: ../Dockerfile-pubsub
+    depends_on:
+      - pubsub
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8086

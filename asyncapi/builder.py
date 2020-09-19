@@ -8,10 +8,10 @@ from typing import Any, DefaultDict, Dict, Optional
 
 import requests
 import yaml
-from broadcaster import Broadcast
 from jsondaora import jsonschema_asdataclass
 
 from .api import AsyncApi, OperationsTypeHint
+from .events.handler import EventsHandler
 from .exceptions import (
     EmptyServersError,
     InvalidAsyncApiVersionError,
@@ -57,9 +57,11 @@ def build_api_auto_spec(
     server: Optional[str] = None,
     republish_errors: bool = True,
     server_bindings: Optional[str] = None,
+    channels_subscribes: Optional[str] = None,
 ) -> AsyncApi:
     spec = getattr(importlib.import_module(module_name), 'spec')
     set_api_spec_server_bindings(spec, server_bindings)
+    set_api_spec_channels_subscribes(spec, channels_subscribes)
     return build_api_from_spec(
         spec, module_name, server, republish_errors, server_bindings,
     )
@@ -201,10 +203,13 @@ def build_api_from_spec(
         ServerNotFoundError(server)
 
     operations = build_channel_operations(spec, module_name)
-    broadcast = Broadcast(build_broadcaster_url(spec.servers[server]))
+    events_handler = EventsHandler(build_broadcaster_url(spec.servers[server]))
 
     return AsyncApi(
-        spec, operations, broadcast, republish_error_messages=republish_errors
+        spec,
+        operations,
+        events_handler,
+        republish_error_messages=republish_errors,
     )
 
 

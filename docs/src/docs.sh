@@ -1,1 +1,1 @@
-PYTHONPATH=. asyncapi-docs --path api-spec.yaml
+asyncapi-docs --path api-spec.yaml

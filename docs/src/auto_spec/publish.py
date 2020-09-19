@@ -13,6 +13,7 @@ message = api.payload(channel_id, id='fake-user', name='Fake User', age=33)
 async def publish() -> None:
     await api.connect()
     await api.publish(channel_id, message)
+    await api.disconnect()
 
 
 asyncio.run(publish())

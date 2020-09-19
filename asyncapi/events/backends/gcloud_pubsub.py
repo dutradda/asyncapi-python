@@ -10,14 +10,14 @@ from .. import Event
 
 
 class GCloudPubSubBackend(BroadcastBackend):
-    def __init__(self, url: str):
+    def __init__(self, url: str, bindings: Dict[str, str] = {}):
         url_parsed = urlparse(url, scheme='gcloud-pubsub')
         self._project = url_parsed.netloc
         self._consumer_channels: Dict[str, str] = {}
         self._producer_channels: Dict[str, str] = {}
         self._channel_index = 0
         self._should_stop = True
-        self._set_consumer_config(url_parsed.query)
+        self._set_consumer_config(bindings)
 
     async def connect(self) -> None:
         self._producer = pubsub_v1.PublisherClient()
@@ -97,29 +97,23 @@ class GCloudPubSubBackend(BroadcastBackend):
 
         return None
 
-    def _set_consumer_config(self, query: str) -> None:
-        consumer_wait_time: float = 1
+    def _set_consumer_config(self, bindings: Dict[str, str]) -> None:
+        consumer_wait_time = 1.0
         consumer_ack_messages = True
-        splitted_query = query.split('&')
 
-        if splitted_query[0]:
-            for arg in splitted_query:
-                arg_splitted = arg.split('=')
-                if len(arg_splitted) == 2:
-                    arg_name, arg_value = arg_splitted
+        for config_name, config_value in bindings.items():
+            if config_name == 'consumer_wait_time':
+                consumer_wait_time = float(config_value)
 
-                    if arg_name == 'consumer_wait_time':
-                        consumer_wait_time = float(arg_value)
-
-                    elif arg_name == 'consumer_ack_messages':
-                        consumer_ack_messages = arg_value in (
-                            '1',
-                            'true',
-                            't',
-                            'True',
-                            'y',
-                            'yes',
-                        )
+            elif config_name == 'consumer_ack_messages':
+                consumer_ack_messages = config_value in (
+                    '1',
+                    'true',
+                    't',
+                    'True',
+                    'y',
+                    'yes',
+                )
 
         self._consumer_wait_time = consumer_wait_time
         self._consumer_ack_messages = consumer_ack_messages

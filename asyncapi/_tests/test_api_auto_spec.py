@@ -23,7 +23,10 @@ async def test_should_build_api_with_servers_bindings(
     )
 
     assert fake_events_handler_cls.call_args_list == [
-        mocker.call('kafka://fake.fake?option1=0.1&option2=0')
+        mocker.call(
+            url='kafka://fake.fake',
+            bindings={'option1': '0.1', 'option2': '0'},
+        )
     ]
 
 

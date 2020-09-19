@@ -47,9 +47,7 @@ def build_api(
     spec = build_spec_from_path(path)
     set_api_spec_server_bindings(spec, server_bindings)
     set_api_spec_channels_subscribes(spec, channels_subscribes)
-    return build_api_from_spec(
-        spec, module_name, server, republish_errors, server_bindings,
-    )
+    return build_api_from_spec(spec, module_name, server, republish_errors)
 
 
 def build_api_auto_spec(
@@ -62,9 +60,7 @@ def build_api_auto_spec(
     spec = getattr(importlib.import_module(module_name), 'spec')
     set_api_spec_server_bindings(spec, server_bindings)
     set_api_spec_channels_subscribes(spec, channels_subscribes)
-    return build_api_from_spec(
-        spec, module_name, server, republish_errors, server_bindings,
-    )
+    return build_api_from_spec(spec, module_name, server, republish_errors)
 
 
 def build_spec_from_path(path: str) -> Specification:
@@ -187,23 +183,27 @@ def set_api_spec_channels_subscribes(
 def build_api_from_spec(
     spec: Specification,
     module_name: str,
-    server: Optional[str],
+    server_name: Optional[str],
     republish_errors: bool,
-    server_bindings: Optional[str],
 ) -> AsyncApi:
     if spec.servers is None or not spec.servers:
         raise EmptyServersError()
 
-    if server is None:
-        server = tuple(spec.servers.keys())[-1]
+    if server_name is None:
+        server_name = tuple(spec.servers.keys())[-1]
 
     try:
-        spec.servers[server].protocol.value
+        server = spec.servers[server_name]
     except KeyError:
-        ServerNotFoundError(server)
+        ServerNotFoundError(server_name)
 
     operations = build_channel_operations(spec, module_name)
-    events_handler = EventsHandler(build_broadcaster_url(spec.servers[server]))
+    events_handler = EventsHandler(
+        url=f'{server.protocol.value}://{server.url}',
+        bindings=server.bindings.get(server.protocol, {})
+        if server.bindings
+        else {},
+    )
 
     return AsyncApi(
         spec,
@@ -211,20 +211,6 @@ def build_api_from_spec(
         events_handler,
         republish_error_messages=republish_errors,
     )
-
-
-def build_broadcaster_url(server: Server) -> str:
-    url = f'{server.protocol.value}://{server.url}'
-
-    if server.bindings and server.protocol in server.bindings:
-        url += '?' + '&'.join(
-            [
-                f'{name}={value}'
-                for name, value in server.bindings[server.protocol].items()
-            ]
-        )
-
-    return url
 
 
 def build_channel_operations(

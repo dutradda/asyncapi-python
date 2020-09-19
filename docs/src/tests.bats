@@ -134,6 +134,21 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
+@test "should receive message auto spec" {
+    cd docs/src/auto_spec
+    sed -r -e "s/asyncapi-subscriber/coverage run -p -m 'asyncapi.subscriber'/" \
+        ./subscriber.sh > /tmp/asyncapi-subscriber.sh
+    bash /tmp/asyncapi-subscriber.sh > /tmp/asyncapi-subscriber.log &
+    sleep 1
+    coverage run -p publish.py
+    sleep 1
+    ps ax | grep 'asyncapi.subscriber' | \
+        grep -v -E 'bats|grep' | sed -r -e 's/ ?([0-9]+) .*/\1/g' | \
+        xargs kill -SIGTERM 2>/dev/null
+    [ "$(head -2 /tmp/asyncapi-subscriber.log)" = "$(cat ../subscriber-receive-message.output)" ]
+}
+
+
 @test "should serve docs" {
     cd docs/src/auto_spec
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
@@ -196,7 +211,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should publish message from http spec" {
+@test "should publish message http auto spec" {
     cd docs/src/auto_spec
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
         ./docs.sh > /tmp/asyncapi-docs.sh
@@ -212,7 +227,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should receive message from http spec" {
+@test "should receive message http auto spec" {
     cd docs/src/auto_spec
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
         ./docs.sh > /tmp/asyncapi-docs.sh
@@ -231,7 +246,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should publish gcloud-pubsub message from http spec" {
+@test "should publish gcloud-pubsub message http spec" {
     cd docs/src/gcloud_pubsub
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
         ./docs.sh > /tmp/asyncapi-docs.sh
@@ -247,7 +262,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should receive gcloud-pubsub message from http spec" {
+@test "should receive gcloud-pubsub message http spec" {
     cd docs/src/gcloud_pubsub
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
         ./docs.sh > /tmp/asyncapi-docs.sh
@@ -266,7 +281,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should publish gcloud-pubsub message from python spec" {
+@test "should publish gcloud-pubsub message python spec" {
     cd docs/src/gcloud_pubsub
     run coverage run -p py_spec_publish.py
     echo "$output"
@@ -275,7 +290,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should receive gcloud-pubsub message from python spec" {
+@test "should receive gcloud-pubsub message python spec" {
     cd docs/src/gcloud_pubsub
     sed -r -e "s/asyncapi-subscriber/coverage run -p -m 'asyncapi.subscriber'/" \
         ./py_spec_subscriber.sh > /tmp/asyncapi-subscriber.sh
@@ -290,7 +305,7 @@ export PUBSUB_EMULATOR_HOST=localhost:8086
 }
 
 
-@test "should receive gcloud-pubsub message with server bindings" {
+@test "should receive gcloud-pubsub message server bindings" {
     cd docs/src/gcloud_pubsub
     sed -r -e "s/asyncapi-docs/coverage run -p -m 'asyncapi.docs'/" \
         ./docs.sh > /tmp/asyncapi-docs.sh

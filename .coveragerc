@@ -1,6 +1,7 @@
 [run]
 source =
     asyncapi
+    .
 omit =
     */test_*.py
     *conftest.py

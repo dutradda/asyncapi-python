@@ -66,22 +66,22 @@ $ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ```
 
 
-## Specification Example
+## YAML Specification Example
 
 ```yaml
-{!./src/api-spec.yaml!}
+{!./src/yaml_spec/api-spec.yaml!}
 ```
 
 ### Creating subscribers module
 
 ```python
-{!./src/user_events.py!}
+{!./src/yaml_spec/user_events.py!}
 ```
 
 ### Start subscriber to listen events
 
 ```bash
-{!./src/subscriber.sh!}
+{!./src/yaml_spec/subscriber.sh!}
 ```
 
 ```
@@ -91,7 +91,7 @@ $ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ### Publishing Updates
 
 ```python
-{!./src/publish.py!}
+{!./src/yaml_spec/publish.py!}
 ```
 
 ```
@@ -108,9 +108,8 @@ python publish.py
 
 ### Expose Specification
 
-
 ```bash
-{!./src/docs.sh!}
+{!./src/yaml_spec/docs.sh!}
 ```
 
 ```bash
@@ -121,19 +120,19 @@ curl -i localhost:5000/asyncapi.yaml
 ## Python Specification Example
 
 ```python
-{!./src/specification.py!}
+{!./src/python_spec/specification.py!}
 ```
 
 ### Creating subscribers module
 
 ```python
-{!./src/py_spec_user_events.py!}
+{!./src/python_spec/user_events.py!}
 ```
 
 ### Start subscriber to listen events
 
 ```bash
-{!./src/py_spec_subscriber.sh!}
+{!./src/python_spec/subscriber.sh!}
 ```
 
 ```
@@ -143,7 +142,7 @@ curl -i localhost:5000/asyncapi.yaml
 ### Publishing Updates
 
 ```python
-{!./src/py_spec_publish.py!}
+{!./src/python_spec/publish.py!}
 ```
 
 ```
@@ -160,9 +159,8 @@ python py_spec_publish.py
 
 ### Expose Specification
 
-
 ```bash
-{!./src/py_spec_docs.sh!}
+{!./src/python_spec/docs.sh!}
 ```
 
 ```bash

@@ -1,1 +1,1 @@
-../docs.sh
+../yaml_spec/docs.sh

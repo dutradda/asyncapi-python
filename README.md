@@ -66,7 +66,7 @@ $ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ```
 
 
-## Specification Example
+## YAML Specification Example
 
 ```yaml
 asyncapi: 2.0.0
@@ -186,7 +186,6 @@ Received update for user id=fake-user
 
 ### Expose Specification
 
-
 ```bash
 asyncapi-docs --path api-spec.yaml
 
@@ -248,7 +247,7 @@ spec = asyncapi.Specification(
 ### Creating subscribers module
 
 ```python
-# py_spec_user_events.py
+# user_events.py
 
 import specification
 
@@ -266,7 +265,7 @@ async def receive_user_update(
 ### Start subscriber to listen events
 
 ```bash
-PYTHONPATH=. asyncapi-subscriber --api-module py_spec_user_events
+PYTHONPATH=. asyncapi-subscriber --api-module user_events
 
 ```
 
@@ -278,7 +277,7 @@ Waiting messages...
 ### Publishing Updates
 
 ```python
-# py_spec_publish.py
+# publish.py
 
 import asyncio
 
@@ -318,7 +317,6 @@ Received update for user id=fake-user
 ```
 
 ### Expose Specification
-
 
 ```bash
 PYTHONPATH=. asyncapi-docs --api-module specification

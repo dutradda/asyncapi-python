@@ -19,7 +19,8 @@ setup-asyncapi: //check-virtualenv
 
 coverage: //check-virtualenv
     coverage combine .coverage.* \
-        docs/src/.coverage.* \
+        docs/src/yaml_spec/.coverage.* \
+        docs/src/python_spec/.coverage.* \
         docs/src/auto_spec/.coverage.* \
         docs/src/gcloud_pubsub/.coverage.*
     coverage report

@@ -210,18 +210,6 @@ without code generation.
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../auto-spec/" title="Declaring Specification" class="md-nav__link">
-      Declaring Specification
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -293,10 +281,144 @@ without code generation.
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#request-yaml-specification" class="md-nav__link">
+    Request YAML Specification
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-json-specification" class="md-nav__link">
+    Request JSON Specification
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Google PubSub Tutorial
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Google PubSub Tutorial" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Google PubSub Tutorial
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gcloud-pubsub/http-specification/" title="HTTP Specification" class="md-nav__link">
+      HTTP Specification
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gcloud-pubsub/python-specification/" title="Python Specification" class="md-nav__link">
+      Python Specification
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gcloud-pubsub/server-bindings/" title="PubSub Server Bindings" class="md-nav__link">
+      PubSub Server Bindings
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Auto Spec Tutorial
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Auto Spec Tutorial" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Auto Spec Tutorial
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../auto-spec/module/" title="Specification module" class="md-nav__link">
+      Specification module
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../auto-spec/decorator/" title="Specification decorator" class="md-nav__link">
+      Specification decorator
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -384,6 +506,20 @@ without code generation.
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#request-yaml-specification" class="md-nav__link">
+    Request YAML Specification
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request-json-specification" class="md-nav__link">
+    Request JSON Specification
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -401,8 +537,54 @@ without code generation.
                 
                 
                 <h1 id="serving-the-asyncapi-docs">Serving the AsyncAPI Docs</h1>
-<h2 id="serve-docs-from-an-already-created-spec">Serve docs from an already created spec</h2>
-<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-docs --api-module user_events
+<h3 id="serve-docs-from-an-already-created-spec">Serve docs from an already created spec</h3>
+<div class="codehilite"><pre><span></span><code><span class="nt">asyncapi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.0.0</span>
+
+<span class="nt">info</span><span class="p">:</span>
+  <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">User API</span>
+  <span class="nt">version</span><span class="p">:</span> <span class="s">&#39;1.0.0&#39;</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">API to manage users</span>
+
+<span class="nt">servers</span><span class="p">:</span>
+  <span class="nt">development</span><span class="p">:</span>
+    <span class="nt">url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">localhost</span>
+    <span class="nt">protocol</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">redis</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Development Broker Server</span>
+
+<span class="nt">channels</span><span class="p">:</span>
+  <span class="nt">user/update</span><span class="p">:</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Topic for user updates</span>
+    <span class="nt">subscribe</span><span class="p">:</span>
+      <span class="nt">operationId</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">receive_user_update</span>
+      <span class="nt">message</span><span class="p">:</span>
+        <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/messages/UserUpdate&#39;</span>
+    <span class="nt">publish</span><span class="p">:</span>
+      <span class="nt">message</span><span class="p">:</span>
+        <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/messages/UserUpdate&#39;</span>
+
+<span class="nt">components</span><span class="p">:</span>
+  <span class="nt">messages</span><span class="p">:</span>
+    <span class="nt">UserUpdate</span><span class="p">:</span>
+      <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">userUpdate</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">User Update</span>
+      <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Inform about users updates</span>
+      <span class="nt">payload</span><span class="p">:</span>
+        <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+        <span class="nt">required</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+        <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">id</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">name</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">age</span><span class="p">:</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
+
+<span class="nt">defaultContentType</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">application/json</span>
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>asyncapi-docs --path api-spec.yaml
 </code></pre></div>
 
 
@@ -416,8 +598,8 @@ INFO:     Finished server process [...]
 </code></pre></div>
 
 
-<h2 id="create-subscriber-module">Create subscriber module</h2>
-<div class="codehilite"><pre><span></span><code><span class="c1"># user_events_http.py</span>
+<h3 id="create-subscriber-module">Create subscriber module</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># user_events.py</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
@@ -427,14 +609,14 @@ INFO:     Finished server process [...]
 </code></pre></div>
 
 
-<h2 id="start-subscriber-to-listen-events-from-exposed-spec">Start subscriber to listen events from exposed spec</h2>
+<h3 id="start-subscriber-to-listen-events-from-exposed-spec">Start subscriber to listen events from exposed spec</h3>
 <div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber <span class="se">\</span>
     --url http://localhost:5000/asyncapi.json <span class="se">\</span>
-    --api-module user_events_http
+    --api-module user_events
 </code></pre></div>
 
 
-<h2 id="publishing-updates-from-exposed-spec">Publishing updates from exposed spec</h2>
+<h3 id="publishing-updates-from-exposed-spec">Publishing updates from exposed spec</h3>
 <div class="codehilite"><pre><span></span><code><span class="c1"># publish.py</span>
 
 <span class="kn">import</span> <span class="nn">asyncio</span>
@@ -450,6 +632,7 @@ INFO:     Finished server process [...]
 <span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 
 
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
@@ -458,13 +641,138 @@ INFO:     Finished server process [...]
 </code></pre></div>
 
 
-<div class="codehilite"><pre><span></span><code>Published update for user=fake-user
+<div class="codehilite"><pre><span></span><code>python publish.py
+
+Published update for user=fake-user
 </code></pre></div>
 
 
-<h2 id="receive-updates">Receive Updates</h2>
+<h3 id="receive-updates">Receive Updates</h3>
 <div class="codehilite"><pre><span></span><code>Waiting messages...
 Received update for user id=fake-user
+</code></pre></div>
+
+
+<h3 id="request-yaml-specification">Request YAML Specification</h3>
+<div class="codehilite"><pre><span></span><code>curl -i localhost:5000/asyncapi.yaml
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>HTTP/1.1 200 OK
+date: ...
+server: uvicorn
+content-type: application/x-yaml
+content-length: 833
+
+asyncapi: 2.0.0
+channels:
+  user/update:
+    description: Topic for user updates
+    publish:
+      message:
+        $ref: &#39;#/components/messages/UserUpdate&#39;
+    subscribe:
+      message:
+        $ref: &#39;#/components/messages/UserUpdate&#39;
+      operationId: receive_user_update
+components:
+  messages:
+    UserUpdate:
+      name: userUpdate
+      payload:
+        properties:
+          age:
+            type: integer
+          id:
+            type: string
+          name:
+            type: string
+        required:
+        - id
+        type: object
+      summary: Inform about users updates
+      title: User Update
+defaultContentType: application/json
+info:
+  description: API to manage users
+  title: User API
+  version: 1.0.0
+servers:
+  development:
+    description: Development Broker Server
+    protocol: redis
+    url: localhost
+</code></pre></div>
+
+
+<h3 id="request-json-specification">Request JSON Specification</h3>
+<div class="codehilite"><pre><span></span><code>curl -i localhost:5000/asyncapi.json
+</code></pre></div>
+
+
+<div class="codehilite"><pre><span></span><code>HTTP/1.1 200 OK
+date: ...
+server: uvicorn
+content-type: application/json
+content-length: 1231
+
+{
+  &quot;info&quot;: {
+    &quot;title&quot;: &quot;User API&quot;,
+    &quot;version&quot;: &quot;1.0.0&quot;,
+    &quot;description&quot;: &quot;API to manage users&quot;
+  },
+  &quot;channels&quot;: {
+    &quot;user/update&quot;: {
+      &quot;description&quot;: &quot;Topic for user updates&quot;,
+      &quot;publish&quot;: {
+        &quot;message&quot;: {
+          &quot;$ref&quot;: &quot;#/components/messages/UserUpdate&quot;
+        }
+      },
+      &quot;subscribe&quot;: {
+        &quot;operationId&quot;: &quot;receive_user_update&quot;,
+        &quot;message&quot;: {
+          &quot;$ref&quot;: &quot;#/components/messages/UserUpdate&quot;
+        }
+      }
+    }
+  },
+  &quot;servers&quot;: {
+    &quot;development&quot;: {
+      &quot;url&quot;: &quot;localhost&quot;,
+      &quot;protocol&quot;: &quot;redis&quot;,
+      &quot;description&quot;: &quot;Development Broker Server&quot;
+    }
+  },
+  &quot;components&quot;: {
+    &quot;messages&quot;: {
+      &quot;UserUpdate&quot;: {
+        &quot;payload&quot;: {
+          &quot;type&quot;: &quot;object&quot;,
+          &quot;properties&quot;: {
+            &quot;id&quot;: {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;name&quot;: {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;age&quot;: {
+              &quot;type&quot;: &quot;integer&quot;
+            }
+          },
+          &quot;required&quot;: [
+            &quot;id&quot;
+          ]
+        },
+        &quot;name&quot;: &quot;userUpdate&quot;,
+        &quot;title&quot;: &quot;User Update&quot;,
+        &quot;summary&quot;: &quot;Inform about users updates&quot;
+      }
+    }
+  },
+  &quot;defaultContentType&quot;: &quot;application/json&quot;,
+  &quot;asyncapi&quot;: &quot;2.0.0&quot;
 </code></pre></div>
                 
               
@@ -484,7 +792,7 @@ Received update for user id=fake-user
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../auto-spec/" title="Declaring Specification" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href=".." title="Home" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -493,19 +801,19 @@ Received update for user id=fake-user
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Declaring Specification
+                Home
               </div>
             </div>
           </a>
         
         
-          <a href="../contributing/" title="Development - Contributing" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../gcloud-pubsub/http-specification/" title="HTTP Specification" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Development - Contributing
+                HTTP Specification
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

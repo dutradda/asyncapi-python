@@ -256,11 +256,11 @@ without code generation.
 </li>
       
         <li class="md-nav__item">
-  <a href="#specification-example" class="md-nav__link">
-    Specification Example
+  <a href="#yaml-specification-example" class="md-nav__link">
+    YAML Specification Example
   </a>
   
-    <nav class="md-nav" aria-label="Specification Example">
+    <nav class="md-nav" aria-label="YAML Specification Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -364,8 +364,8 @@ without code generation.
 
 
   <li class="md-nav__item">
-    <a href="auto-spec/" title="Declaring Specification" class="md-nav__link">
-      Declaring Specification
+    <a href="expose-docs/" title="Expose Docs" class="md-nav__link">
+      Expose Docs
     </a>
   </li>
 
@@ -375,10 +375,118 @@ without code generation.
       
 
 
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Google PubSub Tutorial
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Google PubSub Tutorial" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Google PubSub Tutorial
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
   <li class="md-nav__item">
-    <a href="expose-docs/" title="Expose Docs" class="md-nav__link">
-      Expose Docs
+    <a href="gcloud-pubsub/http-specification/" title="HTTP Specification" class="md-nav__link">
+      HTTP Specification
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="gcloud-pubsub/python-specification/" title="Python Specification" class="md-nav__link">
+      Python Specification
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="gcloud-pubsub/server-bindings/" title="PubSub Server Bindings" class="md-nav__link">
+      PubSub Server Bindings
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Auto Spec Tutorial
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Auto Spec Tutorial" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Auto Spec Tutorial
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="auto-spec/module/" title="Specification module" class="md-nav__link">
+      Specification module
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="auto-spec/decorator/" title="Specification decorator" class="md-nav__link">
+      Specification decorator
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -453,11 +561,11 @@ without code generation.
 </li>
       
         <li class="md-nav__item">
-  <a href="#specification-example" class="md-nav__link">
-    Specification Example
+  <a href="#yaml-specification-example" class="md-nav__link">
+    YAML Specification Example
   </a>
   
-    <nav class="md-nav" aria-label="Specification Example">
+    <nav class="md-nav" aria-label="YAML Specification Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -596,6 +704,9 @@ without code generation.
 <p><strong>Support for kafka, redis and postgres protocols (same as broadcaster library)</strong></p>
 </li>
 <li>
+<p><strong>Extra support for google cloud pubsub service</strong></p>
+</li>
+<li>
 <p><strong>Expose in http the auto-generated specification</strong></p>
 </li>
 </ul>
@@ -620,6 +731,7 @@ without code generation.
 <li>postgres</li>
 <li>subscriber</li>
 <li>docs</li>
+<li>google-cloud-pubsub</li>
 </ul>
 </li>
 </ul>
@@ -628,13 +740,13 @@ without code generation.
 </code></pre></div>
 
 
-<h2 id="specification-example">Specification Example</h2>
+<h2 id="yaml-specification-example">YAML Specification Example</h2>
 <div class="codehilite"><pre><span></span><code><span class="nt">asyncapi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2.0.0</span>
 
 <span class="nt">info</span><span class="p">:</span>
   <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">User API</span>
   <span class="nt">version</span><span class="p">:</span> <span class="s">&#39;1.0.0&#39;</span>
-  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">API do manage users</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">API to manage users</span>
 
 <span class="nt">servers</span><span class="p">:</span>
   <span class="nt">development</span><span class="p">:</span>
@@ -713,6 +825,7 @@ without code generation.
 <span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 
 
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
@@ -734,7 +847,7 @@ Received update for user id=fake-user
 
 
 <h3 id="expose-specification">Expose Specification</h3>
-<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-docs --path api-spec.yaml
+<div class="codehilite"><pre><span></span><code>asyncapi-docs --path api-spec.yaml
 </code></pre></div>
 
 
@@ -779,7 +892,7 @@ Received update for user id=fake-user
 
 <span class="n">spec</span> <span class="o">=</span> <span class="n">asyncapi</span><span class="o">.</span><span class="n">Specification</span><span class="p">(</span>
     <span class="n">info</span><span class="o">=</span><span class="n">asyncapi</span><span class="o">.</span><span class="n">Info</span><span class="p">(</span>
-        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;User API&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;API do manage users&#39;</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;User API&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;API to manage users&#39;</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="n">servers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;development&#39;</span><span class="p">:</span> <span class="n">dev_server</span><span class="p">},</span>
     <span class="n">channels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user/update&#39;</span><span class="p">:</span> <span class="n">user_update_channel</span><span class="p">},</span>
@@ -805,7 +918,7 @@ Received update for user id=fake-user
 
 
 <h3 id="start-subscriber-to-listen-events_1">Start subscriber to listen events</h3>
-<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber --api-module py_spec_user_events
+<div class="codehilite"><pre><span></span><code><span class="nv">PYTHONPATH</span><span class="o">=</span>. asyncapi-subscriber --api-module user_events
 </code></pre></div>
 
 
@@ -814,7 +927,7 @@ Received update for user id=fake-user
 
 
 <h3 id="publishing-updates_1">Publishing Updates</h3>
-<div class="codehilite"><pre><span></span><code><span class="c1"># py_spec_publish.py</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># publish.py</span>
 
 <span class="kn">import</span> <span class="nn">asyncio</span>
 
@@ -829,6 +942,7 @@ Received update for user id=fake-user
 <span class="k">async</span> <span class="k">def</span> <span class="nf">publish</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
     <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">api</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
 
 
 <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">publish</span><span class="p">())</span>
@@ -837,7 +951,7 @@ Received update for user id=fake-user
 </code></pre></div>
 
 
-<div class="codehilite"><pre><span></span><code>python py_spec_publish.py
+<div class="codehilite"><pre><span></span><code>python publish.py
 
 Published update for user=fake-user
 </code></pre></div>
@@ -875,13 +989,13 @@ Received update for user id=fake-user
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
         
-          <a href="auto-spec/" title="Declaring Specification" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="expose-docs/" title="Expose Docs" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Declaring Specification
+                Expose Docs
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

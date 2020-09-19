@@ -1,0 +1,64 @@
+HTTP/1.1 200 OK
+date: ...
+server: uvicorn
+content-type: application/json
+content-length: 1231
+
+{
+  "info": {
+    "title": "User API",
+    "version": "1.0.0",
+    "description": "API to manage users"
+  },
+  "channels": {
+    "user/update": {
+      "description": "Topic for user updates",
+      "publish": {
+        "message": {
+          "$ref": "#/components/messages/UserUpdate"
+        }
+      },
+      "subscribe": {
+        "operationId": "receive_user_update",
+        "message": {
+          "$ref": "#/components/messages/UserUpdate"
+        }
+      }
+    }
+  },
+  "servers": {
+    "development": {
+      "url": "localhost",
+      "protocol": "redis",
+      "description": "Development Broker Server"
+    }
+  },
+  "components": {
+    "messages": {
+      "UserUpdate": {
+        "payload": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "age": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "name": "userUpdate",
+        "title": "User Update",
+        "summary": "Inform about users updates"
+      }
+    }
+  },
+  "defaultContentType": "application/json",
+  "asyncapi": "2.0.0"
+}

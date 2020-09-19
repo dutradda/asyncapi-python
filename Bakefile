@@ -39,3 +39,30 @@ docker-down:
 
 docker-logs:
     docker-compose up
+
+tests-docs-index-yaml-spec:
+    bats docs/src/yaml_spec
+
+tests-docs-index-python-spec:
+    bats docs/src/python_spec
+
+tests-docs-auto-spec-python:
+    bats docs/src/auto_spec/python_spec
+
+tests-docs-auto-spec-http:
+    bats docs/src/auto_spec/http_spec
+
+tests-docs-pubsub-http-spec:
+    bats docs/src/gcloud_pubsub/http_spec
+
+tests-docs-pubsub-python-spec:
+    bats docs/src/gcloud_pubsub/python_spec
+
+tests-docs-pubsub-server-bindings:
+    bats docs/src/gcloud_pubsub/server_bindings
+
+tests-docs: tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+
+tests: tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+
+integration: check-code tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-python tests-docs-auto-spec-http tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings coverage

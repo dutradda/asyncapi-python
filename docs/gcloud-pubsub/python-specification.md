@@ -9,13 +9,13 @@ The project repository has a [docker-compose file](https://github.com/dutradda/a
 The `url` attribute of the Server Object is the Google Cloud Platform `project_id`.
 
 ```python
-{!./src/gcloud_pubsub/specification.py!}
+{!./src/gcloud_pubsub/python_spec/specification.py!}
 ```
 
 ## Creating subscribers module
 
 ```python
-{!./src/gcloud_pubsub/py_spec_user_events.py!}
+{!./src/gcloud_pubsub/python_spec/user_events.py!}
 ```
 
 ## Start subscriber to listen events
@@ -26,7 +26,7 @@ It is intentional because google pubsub can accept multiple subscribers with dif
 We will use the `channels-subscribes` argument of the subscriber runner to set the pubsub subscription.
 
 ```bash
-{!./src/gcloud_pubsub/py_spec_subscriber.sh!}
+{!./src/gcloud_pubsub/python_spec/subscriber.sh!}
 ```
 
 ```
@@ -37,7 +37,7 @@ We will use the `channels-subscribes` argument of the subscriber runner to set t
 ## Publishing Updates
 
 ```python
-{!./src/gcloud_pubsub/py_spec_publish.py!}
+{!./src/gcloud_pubsub/python_spec/publish.py!}
 ```
 
 ```

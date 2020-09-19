@@ -28,7 +28,7 @@ Assuming that the above specification has the name `api-spec.yaml`:
 ## Creating subscribers module
 
 ```python
-{!./src/gcloud_pubsub/server_bindings_user_events.py!}
+{!./src/gcloud_pubsub/server_bindings/user_events.py!}
 ```
 
 
@@ -47,7 +47,7 @@ It is intentional because google pubsub can accept multiple subscribers with dif
 We will use the `channels-subscribes` argument of the subscriber runner to set the pubsub subscription.
 
 ```bash
-{!./src/gcloud_pubsub/server_bindings_subscriber.sh!}
+{!./src/gcloud_pubsub/server_bindings/subscriber.sh!}
 ```
 
 ```
@@ -58,7 +58,7 @@ We will use the `channels-subscribes` argument of the subscriber runner to set t
 ## Publishing Updates
 
 ```python
-{!./src/gcloud_pubsub/publish.py!}
+{!./src/gcloud_pubsub/http_spec/publish.py!}
 ```
 
 ```

@@ -2,6 +2,8 @@
 
 ### UNRELEASED
 
+ - Improve documentation
+
  - Create EventsHandler class from broadcaster lib
 
  - Add support for Google Cloud Platform PubSub service

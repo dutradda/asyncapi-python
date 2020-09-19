@@ -169,7 +169,7 @@ print(f"Published update for user={message.id}")
 
 ```
 
-```bash
+```
 python publish.py
 
 
@@ -248,7 +248,7 @@ spec = asyncapi.Specification(
 ### Creating subscribers module
 
 ```python
-# user_events.py
+# py_spec_user_events.py
 
 import specification
 
@@ -302,7 +302,7 @@ print(f"Published update for user={message.id}")
 
 ```
 
-```bash
+```
 python publish.py
 
 

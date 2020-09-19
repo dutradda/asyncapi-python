@@ -95,7 +95,7 @@ $ pip install asyncapi[http,yaml,redis,subscriber,docs]
 ```
 
 ```
-python publish.py
+{!./src/publish.sh!}
 
 {!./src/publish.output!}
 ```
@@ -146,7 +146,7 @@ curl -i localhost:5000/asyncapi.yaml
 ```
 
 ```
-python py_spec_publish.py
+{!./src/publish.sh!}
 
 {!./src/publish.output!}
 ```

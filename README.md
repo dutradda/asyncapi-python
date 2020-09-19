@@ -169,8 +169,9 @@ print(f"Published update for user={message.id}")
 
 ```
 
-```
+```bash
 python publish.py
+
 
 Published update for user=fake-user
 
@@ -301,8 +302,9 @@ print(f"Published update for user={message.id}")
 
 ```
 
-```
-python py_spec_publish.py
+```bash
+python publish.py
+
 
 Published update for user=fake-user
 

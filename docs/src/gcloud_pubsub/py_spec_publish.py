@@ -1,4 +1,4 @@
-# py_spec_publish.py
+# publish.py
 
 import asyncio
 

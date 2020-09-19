@@ -41,6 +41,8 @@ We will use the `channels-subscribes` argument of the subscriber runner to set t
 ```
 
 ```
+{!./src/publish.sh!}
+
 {!./src/publish.output!}
 ```
 

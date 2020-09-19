@@ -23,6 +23,8 @@
 ```
 
 ```
+{!./src/publish.sh!}
+
 {!./src/publish.output!}
 ```
 

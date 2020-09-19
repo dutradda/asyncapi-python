@@ -23,7 +23,7 @@ The `url` attribute of the Server Object is the Google Cloud Platform `project_i
 This specification don't declares subscribers.
 It is intentional because google pubsub can accept multiple subscribers with differents channel names on the same topic.
 
-We will use the `channels_subscribes` argument of the subscriber runner to set the pubsub subscription.
+We will use the `channels-subscribes` argument of the subscriber runner to set the pubsub subscription.
 
 ```bash
 {!./src/gcloud_pubsub/py_spec_subscriber.sh!}

@@ -96,7 +96,9 @@ class AsyncApi:
                         channel_id, **json_message
                     )
 
-                    coro = self.operations[(channel_id, operation_id)](payload)
+                    coro = self.operations[(channel_id, operation_id)](
+                        payload, **getattr(event, 'context', {})
+                    )
 
                     if asyncio.iscoroutine(coro):
                         await coro

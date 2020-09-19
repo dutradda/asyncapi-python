@@ -1,4 +1,4 @@
-# Declaring Specification with Python Code
+# Automatic Specification Declaration
 
 ## Creating subscribers module
 

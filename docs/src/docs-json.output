@@ -2,15 +2,17 @@ HTTP/1.1 200 OK
 date: ...
 server: uvicorn
 content-type: application/json
-content-length: 1014
+content-length: 1231
 
 {
   "info": {
-    "title": "User Events",
-    "version": "1.0.0"
+    "title": "User API",
+    "version": "1.0.0",
+    "description": "API to manage users"
   },
   "channels": {
     "user/update": {
+      "description": "Topic for user updates",
       "publish": {
         "message": {
           "$ref": "#/components/messages/UserUpdate"
@@ -27,7 +29,8 @@ content-length: 1014
   "servers": {
     "development": {
       "url": "localhost",
-      "protocol": "redis"
+      "protocol": "redis",
+      "description": "Development Broker Server"
     }
   },
   "components": {
@@ -50,7 +53,9 @@ content-length: 1014
             "id"
           ]
         },
-        "name": "userUpdate"
+        "name": "userUpdate",
+        "title": "User Update",
+        "summary": "Inform about users updates"
       }
     }
   },

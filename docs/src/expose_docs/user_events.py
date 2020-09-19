@@ -1,1 +1,7 @@
-../auto_spec/module/user_events.py
+# user_events.py
+
+from typing import Any
+
+
+async def receive_user_update(message: Any) -> None:
+    print(f"Received update for user id={message.id}")

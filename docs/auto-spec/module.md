@@ -47,7 +47,3 @@
 ```bash
 curl -i localhost:5000/asyncapi.yaml
 ```
-
-```
-{!./src/auto_spec/module/docs-yaml.output!}
-```

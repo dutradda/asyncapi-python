@@ -35,11 +35,11 @@ Assuming that the above specification has the name `api-spec.yaml`:
 ## Start subscriber to listen events
 
 For pubsub custom attributes we will use the `server-bindings` argument of the subscriber runner.
-The pubsub EventsHandler accept two parameters: `consumer_wait_time` and `ack_consumed_messages`.
+The pubsub EventsHandler accept two parameters: `consumer_wait_time` and `consumer_ack_messages`.
 The first one is used to wait if there are no messages to consume. The default value is 1 second.
 
 The second parameter tells the EventsHandler to acknowledge the message or not. The default value is `True`.
-When `ack_consumed_messages` is `False`, the acknowledge function will be set on subscriber `kwargs` by the name `ack_func`.
+When `consumer_ack_messages` is `False`, the acknowledge function will be set on subscriber `kwargs` by the name `ack_func`.
 
 This specification don't declares subscribers.
 It is intentional because google pubsub can accept multiple subscribers with differents channel names on the same topic.

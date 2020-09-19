@@ -82,7 +82,7 @@ class GCloudPubSubBackend(BroadcastBackend):
                     channel_id, pubsub_response.message.data.decode()
                 )
 
-                if self._ack_consumed_messages:
+                if self._consumer_ack_messages:
                     self._consumer.acknowledge(
                         pubsub_channel, [pubsub_response.ack_id]
                     )
@@ -99,7 +99,7 @@ class GCloudPubSubBackend(BroadcastBackend):
 
     def _set_consumer_config(self, query: str) -> None:
         consumer_wait_time: float = 1
-        ack_consumed_messages = True
+        consumer_ack_messages = True
         splitted_query = query.split('&')
 
         if splitted_query[0]:
@@ -111,8 +111,8 @@ class GCloudPubSubBackend(BroadcastBackend):
                     if arg_name == 'consumer_wait_time':
                         consumer_wait_time = float(arg_value)
 
-                    elif arg_name == 'ack_consumed_messages':
-                        ack_consumed_messages = arg_value in (
+                    elif arg_name == 'consumer_ack_messages':
+                        consumer_ack_messages = arg_value in (
                             '1',
                             'true',
                             't',
@@ -122,4 +122,4 @@ class GCloudPubSubBackend(BroadcastBackend):
                         )
 
         self._consumer_wait_time = consumer_wait_time
-        self._ack_consumed_messages = ack_consumed_messages
+        self._consumer_ack_messages = consumer_ack_messages

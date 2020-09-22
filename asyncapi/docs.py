@@ -23,6 +23,7 @@ from apidaora import (
 )
 
 from asyncapi import Operation, Specification
+from asyncapi import docs_filters as jinja_filters
 from asyncapi.builder import build_spec_from_path
 from asyncapi.schema import type_as_jsonschema
 from asyncapi.specification_v2_0_0 import as_camel_case
@@ -195,12 +196,35 @@ def build_spec_docs_controllers(
         searchpath=os.path.join(current_dir, 'docs-template')
     )
     template_env = jinja2.Environment(loader=template_loader)
+    template_env.filters['containTags'] = jinja_filters.contain_tags
+    template_env.filters['containNoTag'] = jinja_filters.contain_no_tag
+    template_env.filters['split'] = jinja_filters.split
+    template_env.filters['markdown2html'] = jinja_filters.markdown2html
+    template_env.filters['isExpandable'] = jinja_filters.is_expandable
+    template_env.filters['dump'] = jinja_filters.dump
+    template_env.filters[
+        'nonParserExtensions'
+    ] = jinja_filters.non_parser_extensions
+    template_env.filters['isObject'] = jinja_filters.is_object
+    template_env.filters['isArray'] = jinja_filters.is_array
+    template_env.filters['keys'] = jinja_filters.keys
+    template_env.filters['head'] = jinja_filters.head
+    template_env.filters[
+        'getPayloadExamples'
+    ] = jinja_filters.get_payload_examples
+    template_env.filters['generateExample'] = jinja_filters.generate_example
+    template_env.filters[
+        'getHeadersExamples'
+    ] = jinja_filters.get_headers_examples
+    template_env.filters['boolean'] = jinja_filters.boolean
     json_spec = spec_asjson(spec)
+    set_messages(json_spec)
+    docs_spec_obj = DocsSpecObject(json_spec)
 
     @route.get('/docs')
     def index_controller() -> Response:
         template = template_env.get_template('template/index.html')
-        return html(template.render(params={}, asyncapi=json_spec))
+        return html(template.render(params={}, asyncapi=docs_spec_obj))
 
     @route.get('/css/tailwind.min.css')
     def tailwind_controller() -> Response:
@@ -230,6 +254,99 @@ def build_spec_docs_controllers(
         highlight_controller,
         main_js_controller,
     ]
+
+
+class DocsSpecObject:
+    def __init__(self, spec: Dict[str, Any]):
+        self.spec = spec
+
+    def __getattr__(self, attr_name: str) -> Any:
+        if attr_name == 'ext':
+            return lambda ext_name: self.spec.get(ext_name)
+
+        if attr_name == 'allMessages':
+            return lambda: all_messages(self.spec)
+
+        if attr_name == 'json':
+            return tojson(self.spec)
+
+        if attr_name == 'hasServers':
+            return lambda: 'servers' in self.spec
+
+        if attr_name == 'hasChannels':
+            return lambda: 'channels' in self.spec
+
+        if attr_name == 'hasTags':
+            return lambda: 'tags' in self.spec
+
+        if attr_name == 'hasPublish':
+            return lambda: 'publish' in self.spec
+
+        if attr_name == 'hasSubscribe':
+            return lambda: 'subscribe' in self.spec
+
+        if (
+            attr_name == 'properties'
+            or attr_name == 'servers'
+            or attr_name == 'channels'
+        ):
+            return lambda: dict(
+                **{
+                    k: DocsSpecObject(v)
+                    for k, v in self.spec.get(attr_name, {}).items()
+                }
+            ).items()
+
+        return lambda: (
+            DocsSpecObject(attr)
+            if isinstance(attr := self.spec.get(attr_name), dict)
+            else attr
+        )
+
+
+def set_messages(spec: Dict[str, Any]) -> None:
+    messages_refs = {}
+
+    for muid, message in (
+        spec.get('components', {}).get('messages', {}).items()
+    ):
+        message['uid'] = message.get('name', muid)
+        messages_refs[f'#/components/messages/{muid}'] = message
+
+    for channel_name, channel in spec.get('channels', {}).items():
+        pub_message = channel.get('publish', {}).get('message', {})
+        sub_message = channel.get('subscribe', {}).get('message', {})
+
+        if '$ref' in pub_message:
+            if pub_message['$ref'] in messages_refs:
+                channel['publish']['message'] = messages_refs[
+                    channel['publish']['message']['$ref']
+                ]
+
+        if '$ref' in sub_message:
+            if sub_message['$ref'] in messages_refs:
+                channel['subscribe']['message'] = messages_refs[
+                    channel['subscribe']['message']['$ref']
+                ]
+
+
+def all_messages(spec: Any) -> Any:
+    messages = {}
+
+    for k, m in spec.get('components', {}).get('messages', {}).items():
+        messages[k] = DocsSpecObject(m)
+
+    return messages.items()
+
+
+def tojson(spec: Any) -> Any:
+    def _tojson(attr_name: Optional[str] = None) -> Any:
+        if attr_name is None:
+            return spec
+
+        return spec.get(attr_name)
+
+    return _tojson
 
 
 def run() -> None:

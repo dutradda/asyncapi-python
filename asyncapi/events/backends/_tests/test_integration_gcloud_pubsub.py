@@ -69,6 +69,6 @@ async def test_gcloud_pubsub_consumer_wait_time_and_consumer_ack_messages_option
         async with handler.subscribe('chatroom') as subscriber:
             await handler.publish('chatroom', 'hello')
             event = await subscriber.get()
-            event.context['ack_func']()
+            await event.context['ack_func']()
             assert event.channel == 'chatroom'
             assert event.message == 'hello'

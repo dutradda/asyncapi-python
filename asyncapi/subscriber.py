@@ -21,8 +21,8 @@ def main(
         None, envvar='ASYNCAPI_SERVER_BINDINGS'
     ),
     api_module: str = typer.Option('', envvar='ASYNCAPI_MODULE'),
-    republish_errors: bool = typer.Option(
-        True, envvar='ASYNCAPI_REPUBLISH_ERRORS'
+    republish_errors: Optional[bool] = typer.Option(
+        None, envvar='ASYNCAPI_REPUBLISH_ERRORS'
     ),
     channel: Optional[str] = typer.Option(None, envvar='ASYNCAPI_CHANNEL'),
     workers: int = typer.Option(1, envvar='ASYNCAPI_WORKERS'),

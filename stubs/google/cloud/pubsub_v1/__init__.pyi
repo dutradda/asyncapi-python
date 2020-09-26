@@ -1,6 +1,8 @@
 from typing import List, Any
 from concurrent.futures import Future
 
+from .types import PullResponse
+
 
 class PublisherClient:
     def topic_path(self, project: str, topic: str) -> str: ...
@@ -10,25 +12,12 @@ class PublisherClient:
     def stop(self) -> None: ...
 
 
-class PubSubMessage:
-    data: bytes
-
-
-class PubSubResponse:
-    message: PubSubMessage
-    ack_id: str
-
-
-class SubscriberResponse:
-    received_messages: List[PubSubResponse]
-
-
 class SubscriberClient:
     def subscription_path(self, project: str, subscription: str) -> str: ...
 
     def pull(
         self, subscription: str, max_messages: int, return_immediately: bool
-    ) -> SubscriberResponse: ...
+    ) -> PullResponse: ...
 
     def acknowledge(self, subscription: str, ids: List[str]) -> None: ...
 

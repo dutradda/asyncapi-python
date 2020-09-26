@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Improve gcloud pubsub backend
+
 ### 0.9.0 - 2020-09-19
 
  - Improve documentation

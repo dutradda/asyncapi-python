@@ -40,7 +40,7 @@ def build_api(
     path: str,
     server: Optional[str] = None,
     module_name: str = '',
-    republish_errors: bool = True,
+    republish_errors: Optional[bool] = None,
     server_bindings: Optional[str] = None,
     channels_subscribes: Optional[str] = None,
 ) -> AsyncApi:
@@ -53,7 +53,7 @@ def build_api(
 def build_api_auto_spec(
     module_name: str,
     server: Optional[str] = None,
-    republish_errors: bool = True,
+    republish_errors: Optional[bool] = None,
     server_bindings: Optional[str] = None,
     channels_subscribes: Optional[str] = None,
 ) -> AsyncApi:
@@ -184,7 +184,7 @@ def build_api_from_spec(
     spec: Specification,
     module_name: str,
     server_name: Optional[str],
-    republish_errors: bool,
+    republish_errors: Optional[bool],
 ) -> AsyncApi:
     if spec.servers is None or not spec.servers:
         raise EmptyServersError()
@@ -204,6 +204,12 @@ def build_api_from_spec(
         if server.bindings
         else {},
     )
+
+    if republish_errors is None:
+        if server.protocol.value is ProtocolType.GCLOUD_PUBSUB:
+            republish_errors = False
+        else:
+            republish_errors = True
 
     return AsyncApi(
         spec,

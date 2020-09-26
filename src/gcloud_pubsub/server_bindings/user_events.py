@@ -1,10 +1,7 @@
 # user_events.py
 
-from typing import Any, Callable
+from typing import Any
 
 
-async def receive_user_update(
-    message: Any, ack_func: Callable[[], None]
-) -> None:
+async def receive_user_update(message: Any) -> None:
     print(f"Received update for user id={message.id}")
-    ack_func()

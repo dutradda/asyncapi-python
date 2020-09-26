@@ -582,14 +582,11 @@ The project repository has a <a href="https://github.com/dutradda/asyncapi-pytho
 <h2 id="creating-subscribers-module">Creating subscribers module</h2>
 <div class="codehilite"><pre><span></span><code><span class="c1"># user_events.py</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">receive_user_update</span><span class="p">(</span>
-    <span class="n">message</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ack_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">receive_user_update</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received update for user id=</span><span class="si">{</span><span class="n">message</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">ack_func</span><span class="p">()</span>
 </code></pre></div>
 
 
@@ -606,7 +603,7 @@ It is intentional because google pubsub can accept multiple subscribers with dif
     --url http://localhost:5000/asyncapi.yaml <span class="se">\</span>
     --api-module user_events <span class="se">\</span>
     --channels-subscribes <span class="s1">&#39;user-update:user-update-custom-sub=receive_user_update&#39;</span> <span class="se">\</span>
-    --server-bindings <span class="s1">&#39;gcloud-pubsub:consumer_wait_time=0.1;consumer_ack_messages=0&#39;</span>
+    --server-bindings <span class="s1">&#39;gcloud-pubsub:consumer_wait_time=0.1;consumer_ack_messages=1&#39;</span>
 </code></pre></div>
 
 

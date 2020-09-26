@@ -43,11 +43,14 @@ def build_api(
     republish_errors: Optional[bool] = None,
     server_bindings: Optional[str] = None,
     channels_subscribes: Optional[str] = None,
+    republish_errors_channels: Optional[str] = None,
 ) -> AsyncApi:
     spec = build_spec_from_path(path)
     set_api_spec_server_bindings(spec, server_bindings)
     set_api_spec_channels_subscribes(spec, channels_subscribes)
-    return build_api_from_spec(spec, module_name, server, republish_errors)
+    return build_api_from_spec(
+        spec, module_name, server, republish_errors, republish_errors_channels
+    )
 
 
 def build_api_auto_spec(
@@ -56,11 +59,14 @@ def build_api_auto_spec(
     republish_errors: Optional[bool] = None,
     server_bindings: Optional[str] = None,
     channels_subscribes: Optional[str] = None,
+    republish_errors_channels: Optional[str] = None,
 ) -> AsyncApi:
     spec = getattr(importlib.import_module(module_name), 'spec')
     set_api_spec_server_bindings(spec, server_bindings)
     set_api_spec_channels_subscribes(spec, channels_subscribes)
-    return build_api_from_spec(spec, module_name, server, republish_errors)
+    return build_api_from_spec(
+        spec, module_name, server, republish_errors, republish_errors_channels
+    )
 
 
 def build_spec_from_path(path: str) -> Specification:
@@ -185,6 +191,7 @@ def build_api_from_spec(
     module_name: str,
     server_name: Optional[str],
     republish_errors: Optional[bool],
+    republish_errors_channels: Optional[str],
 ) -> AsyncApi:
     if spec.servers is None or not spec.servers:
         raise EmptyServersError()
@@ -211,11 +218,21 @@ def build_api_from_spec(
         else:
             republish_errors = True
 
+    republish_errors_channels_dict: Optional[Dict[str, str]]
+    if republish_errors_channels is not None:
+        republish_errors_channels_dict = {
+            channel_str.split('=')[0]: channel_str.split('=')[1]
+            for channel_str in republish_errors_channels.split(';')
+        }
+    else:
+        republish_errors_channels_dict = None
+
     return AsyncApi(
         spec,
         operations,
         events_handler,
         republish_error_messages=republish_errors,
+        republish_error_messages_channels=republish_errors_channels_dict,
     )
 
 

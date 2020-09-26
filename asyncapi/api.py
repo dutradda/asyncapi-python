@@ -1,7 +1,7 @@
 import asyncio
 import dataclasses
 import logging
-from typing import Any, Callable, Dict, Tuple, Type
+from typing import Any, Callable, Dict, Optional, Tuple, Type
 
 import orjson
 from jsondaora import DeserializationError, asdataclass, dataclass_asjson
@@ -26,6 +26,7 @@ class AsyncApi:
     operations: OperationsTypeHint
     events_handler: EventsHandler
     republish_error_messages: bool = True
+    republish_error_messages_channels: Optional[Dict[str, str]] = None
     logger: logging.Logger = logging.getLogger(__name__)
 
     async def publish_json(
@@ -115,10 +116,20 @@ class AsyncApi:
 
                     self.logger.exception(f"message={event.message[:100]}")
 
+                    republish_channel = (
+                        self.republish_error_messages_channels.get(
+                            channel_id, channel_id
+                        )
+                        if self.republish_error_messages_channels is not None
+                        else channel_id
+                    )
+
                     try:
-                        await self.publish(channel_id, payload)
+                        await self.publish(republish_channel, payload)
                     except UnboundLocalError:
-                        await self.publish_json(channel_id, json_message)
+                        await self.publish_json(
+                            republish_channel, json_message
+                        )
 
     def publish_operation(self, channel_id: str) -> Operation:
         return self.operation('publish', channel_id)

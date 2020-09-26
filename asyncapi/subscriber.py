@@ -29,6 +29,9 @@ def main(
     channels_subscribes: Optional[str] = typer.Option(
         None, envvar='ASYNCAPI_CHANNELS_SUBSCRIBES'
     ),
+    republish_errors_channels: Optional[str] = typer.Option(
+        None, envvar='ASYNCAPI_REPUBLISH_ERRORS_CHANNELS'
+    ),
 ) -> None:
 
     if url is None:
@@ -41,6 +44,7 @@ def main(
             server_bindings=server_bindings,
             republish_errors=republish_errors,
             channels_subscribes=channels_subscribes,
+            republish_errors_channels=republish_errors_channels,
         )
 
     else:
@@ -51,6 +55,7 @@ def main(
             server_bindings=server_bindings,
             republish_errors=republish_errors,
             channels_subscribes=channels_subscribes,
+            republish_errors_channels=republish_errors_channels,
         )
 
     fork_app(workers)

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.11.0 - 2020-09-29
 
  - Improve api.listen error handling
 

@@ -1,13 +1,14 @@
 import asynctest
 import pytest
-from jsondaora import DeserializationError
 
 import asyncapi.exceptions
 
 
 @pytest.fixture
-def fake_api():
-    return asyncapi.build_api('fake', module_name='asyncapi._tests')
+def fake_api(mocker):
+    api = asyncapi.build_api('fake', module_name='asyncapi._tests')
+    api.logger = mocker.MagicMock()
+    return api
 
 
 @pytest.fixture
@@ -131,12 +132,11 @@ async def test_should_not_listen_for_invalid_message(
         [mocker.MagicMock(message=json_invalid_message)]
     )
 
-    with pytest.raises(DeserializationError) as exc_info:
-        await fake_api.listen('fake')
+    await fake_api.listen('fake')
 
-    assert exc_info.value.args == (
-        'Invalid type=typing.Union[int, NoneType] for field=faked',
-    )
+    assert fake_api.logger.exception.call_args_list == [
+        mocker.call(f'message={json_invalid_message}')
+    ]
     assert not fake_operation.called
 
 
@@ -155,7 +155,7 @@ async def test_should_not_listen_for_operation_error(fake_api_no_operation):
     ) as exc_info:
         await fake_api_no_operation.listen('fake')
 
-    assert exc_info.value.args == ('fake_operation',)
+    assert exc_info.value.args == ('fake', 'fake_operation',)
 
 
 @pytest.mark.asyncio

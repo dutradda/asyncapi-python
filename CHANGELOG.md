@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Improve api.listen error handling
+
 ### 0.10.0 - 2020-09-26
 
  - Improve gcloud pubsub backend

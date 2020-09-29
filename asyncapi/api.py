@@ -87,6 +87,11 @@ class AsyncApi:
         if operation_id is None:
             raise ChannelOperationNotFoundError(channel_id)
 
+        try:
+            operation_func = self.operations[(channel_id, operation_id)]
+        except KeyError:
+            raise OperationIdNotFoundError(channel_id, operation_id)
+
         async with self.events_handler.subscribe(
             channel=channel_id
         ) as subscriber:
@@ -97,39 +102,39 @@ class AsyncApi:
                         channel_id, **json_message
                     )
 
-                    coro = self.operations[(channel_id, operation_id)](
+                    coro = operation_func(
                         payload, **getattr(event, 'context', {})
                     )
 
-                    if asyncio.iscoroutine(coro):
-                        await coro
+                    while asyncio.iscoroutine(coro):
+                        coro = await coro
 
                 except (orjson.JSONDecodeError, DeserializationError):
-                    raise
-
-                except KeyError:
-                    raise OperationIdNotFoundError(operation_id)
-
-                except Exception:
-                    if not self.republish_error_messages:
-                        raise
-
                     self.logger.exception(f"message={event.message[:100]}")
 
-                    republish_channel = (
-                        self.republish_error_messages_channels.get(
-                            channel_id, channel_id
-                        )
-                        if self.republish_error_messages_channels is not None
-                        else channel_id
-                    )
+                except Exception:
+                    self.logger.exception(f"message={event.message[:100]}")
 
-                    try:
-                        await self.publish(republish_channel, payload)
-                    except UnboundLocalError:
-                        await self.publish_json(
-                            republish_channel, json_message
+                    if self.republish_error_messages:
+                        republish_channel = (
+                            self.republish_error_messages_channels.get(
+                                channel_id, channel_id
+                            )
+                            if self.republish_error_messages_channels
+                            is not None
+                            else channel_id
                         )
+
+                        try:
+                            await self.publish(republish_channel, payload)
+                        except UnboundLocalError:
+                            await self.publish_json(
+                                republish_channel, json_message
+                            )
+                        except Exception:
+                            self.logger.exception(
+                                f"message={event.message[:100]}"
+                            )
 
     def publish_operation(self, channel_id: str) -> Operation:
         return self.operation('publish', channel_id)

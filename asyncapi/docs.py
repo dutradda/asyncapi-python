@@ -34,20 +34,33 @@ def main(
     host: str = typer.Option('0.0.0.0', envvar='ASYNCAPI_HOST'),
     port: int = typer.Option(5000, envvar='ASYNCAPI_PORT'),
     path: Optional[str] = typer.Option(None, envvar='ASYNCAPI_PATH'),
+    html_params: Optional[str] = typer.Option(
+        None, envvar='ASYNCAPI_HTML_PARAMS'
+    ),
 ) -> None:
     if path:
         spec = build_spec_from_path(path)
     else:
         spec = getattr(importlib.import_module(api_module), 'spec')
 
-    start(spec, host, port)
+    if html_params:
+        dict_html_params = {
+            str_key_value.split('=')[0]: str_key_value.split('=')[1]
+            for str_key_value in html_params.split(';')
+        }
+    else:
+        dict_html_params = {}
+
+    start(spec, host, port, dict_html_params)
 
 
-def start(spec: Specification, host: str, port: int) -> None:
+def start(
+    spec: Specification, host: str, port: int, html_params: Dict[str, str]
+) -> None:
     controllers = build_yaml_spec_controllers(spec) + [
         build_json_spec_controller(spec)
     ]
-    controllers.extend(build_spec_docs_controllers(spec))
+    controllers.extend(build_spec_docs_controllers(spec, html_params))
     app = appdaora(controllers)
     uvicorn.run(app, host=host, port=port)
 
@@ -188,7 +201,7 @@ def _spec_asjson(generic_value: Any) -> Any:
 
 
 def build_spec_docs_controllers(
-    spec: Specification,
+    spec: Specification, html_params: Dict[str, str],
 ) -> List[RoutedControllerTypeHint]:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = partial(os.path.join, current_dir, 'docs-template', 'template')
@@ -224,7 +237,9 @@ def build_spec_docs_controllers(
     @route.get('/docs')
     def index_controller() -> Response:
         template = template_env.get_template('template/index.html')
-        return html(template.render(params={}, asyncapi=docs_spec_obj))
+        return html(
+            template.render(params=html_params, asyncapi=docs_spec_obj)
+        )
 
     @route.get('/css/tailwind.min.css')
     def tailwind_controller() -> Response:
@@ -264,28 +279,28 @@ class DocsSpecObject:
         if attr_name == 'ext':
             return lambda ext_name: self.spec.get(ext_name)
 
-        if attr_name == 'allMessages':
+        elif attr_name == 'allMessages':
             return lambda: all_messages(self.spec)
 
-        if attr_name == 'json':
+        elif attr_name == 'json':
             return tojson(self.spec)
 
-        if attr_name == 'hasServers':
+        elif attr_name == 'hasServers':
             return lambda: 'servers' in self.spec
 
-        if attr_name == 'hasChannels':
+        elif attr_name == 'hasChannels':
             return lambda: 'channels' in self.spec
 
-        if attr_name == 'hasTags':
+        elif attr_name == 'hasTags':
             return lambda: 'tags' in self.spec
 
-        if attr_name == 'hasPublish':
+        elif attr_name == 'hasPublish':
             return lambda: 'publish' in self.spec
 
-        if attr_name == 'hasSubscribe':
+        elif attr_name == 'hasSubscribe':
             return lambda: 'subscribe' in self.spec
 
-        if (
+        elif (
             attr_name == 'properties'
             or attr_name == 'servers'
             or attr_name == 'channels'
@@ -296,6 +311,13 @@ class DocsSpecObject:
                     for k, v in self.spec.get(attr_name, {}).items()
                 }
             ).items()
+
+        elif attr_name == 'tags':
+            return lambda: (
+                [DocsSpecObject(l_obj) for l_obj in attr]
+                if isinstance(attr := self.spec.get(attr_name), list)
+                else None
+            )
 
         return lambda: (
             DocsSpecObject(attr)

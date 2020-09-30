@@ -19,23 +19,23 @@ def contain_tags(obj: Any, tags_to_check: Any) -> bool:
     def check(tag: Any) -> bool:
         found = False
         for tag_to_check in tags_to_check:
-            if tag_to_check.name == tag.name:
+            if tag_to_check.name() == tag.name():
                 found = True
 
         return found
 
     # Ensure tags are checked for the group tags
-    return any(map(check, obj.tags)) if obj.tags else False
+    return any(map(check, obj.tags())) if obj.tags() else False
 
 
 def contain_no_tag(channels: Any, tags_to_check: Any) -> bool:
     if not channels:
         raise Exception("Channels for containNoTag was not provided?")
 
-    for channel in channels:
+    for _, channel in channels:
         # Check if the channel contains publish or subscribe which does not contain tags
-        if (channel.publish and not channel.publish.tags) or (
-            channel.subscribe and not channel.subscribe.tags
+        if (channel.publish() and not channel.publish().tags()) or (
+            channel.subscribe() and not channel.subscribe().tags()
         ):
             return True
 
@@ -50,16 +50,16 @@ def contain_no_tag(channels: Any, tags_to_check: Any) -> bool:
 
         # Ensure pubsub tags are checked for the group tags
         publish_contains_no_tag = (
-            any(map(check, channel.publish.tags))
-            if channel.publish and channel.publish.tags
+            any(map(check, channel.publish().tags()))
+            if channel.publish() and channel.publish().tags()
             else False
         )
         if publish_contains_no_tag:
             return True
 
         subscribe_contains_no_tag = (
-            any(map(check, channel.subscribe.tags))
-            if channel.subscribe and channel.subscribe.tags
+            any(map(check, channel.subscribe().tags()))
+            if channel.subscribe() and channel.subscribe().tags()
             else False
         )
         if subscribe_contains_no_tag:
@@ -168,7 +168,6 @@ def get_headers_examples(message: Any) -> List[Any]:
 
 
 def boolean(value: Any) -> bool:
-    print(value)
     if value is True:
         return True
 

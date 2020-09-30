@@ -4,7 +4,7 @@ asyncapi
 import importlib
 import io
 from collections import defaultdict, deque
-from typing import Any, DefaultDict, Dict, Optional
+from typing import Any, DefaultDict, Dict, List, Optional
 
 import requests
 import yaml
@@ -33,6 +33,7 @@ from .specification_v2_0_0 import (
     ProtocolType,
     Server,
     Specification,
+    Tag,
 )
 
 
@@ -302,6 +303,7 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
         else None,
         channels=build_channels(spec),
         components=build_components(spec.get('components')),
+        tags=build_tags(spec.get('tags')),
     )
 
 
@@ -381,7 +383,8 @@ def build_operation(
 
     return Operation(
         message=build_message(message_spec) if message_spec else None,
-        operation_id=operation_spec.get('operationId', None),
+        operation_id=operation_spec.get('operationId'),
+        tags=build_tags(operation_spec.get('tags')),
     )
 
 
@@ -420,6 +423,15 @@ def build_components(
         else None,
         schemas=components_spec.get('schemas'),
     )
+
+
+def build_tags(
+    tags_spec: Optional[List[Dict[str, Any]]]
+) -> Optional[List[Tag]]:
+    if tags_spec:
+        return [Tag(**tag_spec) for tag_spec in tags_spec]
+
+    return None
 
 
 def fill_refs(

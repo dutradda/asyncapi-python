@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.11.1 - 2020-09-29
 
  - Improve custom logging
 

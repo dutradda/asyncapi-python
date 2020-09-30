@@ -204,6 +204,14 @@ def build_api_from_spec(
     except KeyError:
         ServerNotFoundError(server_name)
 
+    if module_name:
+        try:
+            logger = getattr(importlib.import_module(module_name), 'logger')
+        except (ImportError, AttributeError):
+            logger = AsyncApi.logger
+    else:
+        logger = AsyncApi.logger
+
     operations = build_channel_operations(spec, module_name)
     events_handler = EventsHandler(
         url=f'{server.protocol.value}://{server.url}',
@@ -233,6 +241,7 @@ def build_api_from_spec(
         events_handler,
         republish_error_messages=republish_errors,
         republish_error_messages_channels=republish_errors_channels_dict,
+        logger=logger,
     )
 
 

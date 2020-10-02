@@ -102,7 +102,7 @@ class GCloudPubSubBackend(BroadcastBackend):
 
             response = self._pull_message_from_consumer(pubsub_channel)
 
-            if not response.received_messages:
+            if response is None or not response.received_messages:
                 await asyncio.sleep(self._consumer_wait_time)
                 if self._channel_index >= len(channels) - 1:
                     channel_index = self._channel_index = 0
@@ -127,17 +127,29 @@ class GCloudPubSubBackend(BroadcastBackend):
 
         return None
 
-    def _pull_message_from_consumer(self, pubsub_channel: str) -> PullResponse:
-        return self._consumer.pull(
-            pubsub_channel, max_messages=1, return_immediately=True,
+    def _pull_message_from_consumer(
+        self, pubsub_channel: str, retries_counter: int = 1,
+    ) -> Optional[PullResponse]:
+        future = self._executor.submit(
+            self._consumer.pull,
+            pubsub_channel,
+            max_messages=1,
+            return_immediately=True,
         )
 
-    def _make_ack_future(
-        self, message: ReceivedMessage, pubsub_channel: str
-    ) -> FutureHint:
-        return self._executor.submit(
-            self._consumer.acknowledge, pubsub_channel, [message.ack_id],
-        )
+        try:
+            return future.result(timeout=self._consumer_pull_message_timeout)
+        except FutureTimeoutError:
+            if retries_counter >= self._consumer_pull_message_retries:
+                self._logger.exception(
+                    f'pull message timeout {self._consumer_pull_message_timeout}; '
+                    f'channel={pubsub_channel}'
+                )
+                return None
+            else:
+                return self._pull_message_from_consumer(
+                    pubsub_channel, retries_counter + 1
+                )
 
     async def wait_ack(
         self,
@@ -145,9 +157,12 @@ class GCloudPubSubBackend(BroadcastBackend):
         pubsub_channel: str,
         retries_counter: int = 1,
     ) -> None:
+        future = self._executor.submit(
+            self._consumer.acknowledge, pubsub_channel, [message.ack_id],
+        )
+
         try:
-            ack_future = self._make_ack_future(message, pubsub_channel)
-            ack_future.result(timeout=self._consumer_ack_timeout)
+            future.result(timeout=self._consumer_ack_timeout)
         except FutureTimeoutError:
             if retries_counter >= self._consumer_ack_retries:
                 self._logger.exception(
@@ -164,6 +179,8 @@ class GCloudPubSubBackend(BroadcastBackend):
         consumer_ack_timeout = 5.0
         consumer_ack_retries = 3
         consumer_max_workers = 10
+        consumer_pull_message_timeout = 1.0
+        consumer_pull_message_retries = 3
         publish_timeout = 5.0
         publish_retries = 3
 
@@ -190,8 +207,14 @@ class GCloudPubSubBackend(BroadcastBackend):
             elif config_name == 'consumer_max_workers':
                 consumer_max_workers = int(config_value)
 
+            elif config_name == 'consumer_pull_message_timeout':
+                consumer_pull_message_timeout = float(config_value)
+
+            elif config_name == 'consumer_pull_message_retries':
+                consumer_pull_message_retries = int(config_value)
+
             elif config_name == 'publish_timeout':
-                publish_timeout = int(config_value)
+                publish_timeout = float(config_value)
 
             elif config_name == 'publish_retries':
                 publish_retries = int(config_value)
@@ -201,5 +224,7 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._consumer_ack_timeout = consumer_ack_timeout
         self._consumer_ack_retries = consumer_ack_retries
         self._consumer_max_workers = consumer_max_workers
+        self._consumer_pull_message_timeout = consumer_pull_message_timeout
+        self._consumer_pull_message_retries = consumer_pull_message_retries
         self._publish_timeout = publish_timeout
         self._publish_retries = publish_retries

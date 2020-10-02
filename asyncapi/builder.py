@@ -221,12 +221,6 @@ def build_api_from_spec(
         else {},
     )
 
-    if republish_errors is None:
-        if server.protocol.value is ProtocolType.GCLOUD_PUBSUB:
-            republish_errors = False
-        else:
-            republish_errors = True
-
     republish_errors_channels_dict: Optional[Dict[str, str]]
     if republish_errors_channels is not None:
         republish_errors_channels_dict = {
@@ -236,13 +230,18 @@ def build_api_from_spec(
     else:
         republish_errors_channels_dict = None
 
+    if republish_errors is not None:
+        kwargs = dict(republish_error_messages=republish_errors)
+    else:
+        kwargs = {}
+
     return AsyncApi(
         spec,
         operations,
         events_handler,
-        republish_error_messages=republish_errors,
         republish_error_messages_channels=republish_errors_channels_dict,
         logger=logger,
+        **kwargs,
     )
 
 

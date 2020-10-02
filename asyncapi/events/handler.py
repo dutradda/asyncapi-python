@@ -1,9 +1,10 @@
+import itertools
 from typing import Any, Dict
 from urllib.parse import urlparse
-import itertools
 
 from broadcaster import Broadcast
 from broadcaster._backends.base import BroadcastBackend
+
 from ..exceptions import GCloudPubSubConsumerDisconnectError
 
 

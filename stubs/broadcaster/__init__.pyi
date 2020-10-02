@@ -9,6 +9,8 @@ class Event:
 
 
 class Broadcast:
+    _subscribers: Dict[str, Any]
+
     def __init__(self, url: str): ...
 
     async def publish(self, channel: str, message: str) -> None: ...

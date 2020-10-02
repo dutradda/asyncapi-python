@@ -1,10 +1,9 @@
 import asyncio
 import functools
-import itertools
-from collections import defaultdict
-from concurrent.futures import TimeoutError as FutureTimeoutError, ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from logging import Logger, getLogger
-from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Any, Dict, Tuple
 from urllib.parse import urlparse
 
 from broadcaster._backends.base import BroadcastBackend
@@ -39,9 +38,6 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._channel_index = 0
         self._logger = logger
         self._set_consumer_config(bindings)
-        self._pull_message_futures: DefaultDict[
-            str, Set[AsyncFutureHint]
-        ] = defaultdict(set)
         self._disconnected = True
         self._executor = ThreadPoolExecutor(self._consumer_max_workers)
 
@@ -52,14 +48,6 @@ class GCloudPubSubBackend(BroadcastBackend):
 
     async def disconnect(self) -> None:
         self._disconnected = True
-
-        for future in itertools.chain(*self._pull_message_futures.values()):
-            try:
-                await future
-            except asyncio.exceptions.CancelledError:
-                ...
-
-        self._pull_message_futures.clear()
         self._producer.stop()
         self._consumer.close()
         del self._producer
@@ -72,9 +60,6 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._consumer_channels[channel] = pubsub_channel
 
     async def unsubscribe(self, channel: str) -> None:
-        for future in self._pull_message_futures[channel]:
-            future.cancel()
-
         self._consumer_channels.pop(channel)
 
     async def publish(
@@ -101,7 +86,7 @@ class GCloudPubSubBackend(BroadcastBackend):
             else:
                 await self.publish(channel, message, retries_counter + 1)
 
-    async def next_published(self) -> Optional[Event]:
+    async def next_published(self) -> Event:
         (
             received_message,
             channel_id,
@@ -138,29 +123,24 @@ class GCloudPubSubBackend(BroadcastBackend):
             pull_message_future = asyncio.get_running_loop().run_in_executor(  # type: ignore
                 self._executor,
                 functools.partial(
-                    self._consumer.pull, pubsub_channel,
-                    max_messages=1, return_immediately=True,
+                    self._consumer.pull,
+                    pubsub_channel,
+                    max_messages=1,
+                    return_immediately=True,
                 ),
             )
-
-            # self._pull_message_futures[channel_id].add(pull_message_future)
 
             try:
                 response = await asyncio.wait_for(
                     pull_message_future, self._consumer_pull_message_timeout
                 )
+
             except asyncio.TimeoutError:
-                # self._pull_message_futures[channel_id].remove(
-                #     pull_message_future
-                # )
                 channel_index += 1
                 await asyncio.sleep(self._consumer_wait_time)
                 continue
-            else:
-                # self._pull_message_futures[channel_id].remove(
-                #     pull_message_future
-                # )
 
+            else:
                 if not response.received_messages:
                     channel_index += 1
                     await asyncio.sleep(self._consumer_wait_time)
@@ -210,7 +190,7 @@ class GCloudPubSubBackend(BroadcastBackend):
         consumer_ack_messages = False
         consumer_ack_timeout = 1.0
         consumer_ack_retries = 3
-        consumer_pull_message_timeout = 1
+        consumer_pull_message_timeout = 1.0
         consumer_max_workers = 10
         publish_timeout = 5.0
         publish_retries = 3

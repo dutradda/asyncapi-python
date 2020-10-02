@@ -1,7 +1,9 @@
 import asyncio
 import functools
+from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from logging import Logger, getLogger
-from typing import Any, Awaitable, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 from urllib.parse import urlparse
 
 from broadcaster._backends.base import BroadcastBackend
@@ -11,12 +13,19 @@ from google.cloud.pubsub_v1.types import PullResponse, ReceivedMessage
 from .. import Event
 
 
+if TYPE_CHECKING:
+    FutureHint = Future[None]
+else:
+    FutureHint = Future
+
+
 class GCloudPubSubBackend(BroadcastBackend):
     def __init__(
         self,
         url: str,
         bindings: Dict[str, str] = {},
         logger: Logger = getLogger(__name__),
+        executor: Optional[ThreadPoolExecutor] = None,
     ):
         url_parsed = urlparse(url, scheme='gcloud-pubsub')
         self._project = url_parsed.netloc
@@ -26,6 +35,11 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._should_stop = True
         self._logger = logger
         self._set_consumer_config(bindings)
+
+        if executor is None:
+            executor = ThreadPoolExecutor()
+
+        self._executor = executor
 
     async def connect(self) -> None:
         self._producer = pubsub_v1.PublisherClient()
@@ -72,7 +86,7 @@ class GCloudPubSubBackend(BroadcastBackend):
 
             channel_id, pubsub_channel = channels[channel_index]
 
-            response = await self._pull_message_from_consumer(pubsub_channel)
+            response = self._pull_message_from_consumer(pubsub_channel)
 
             if not response.received_messages:
                 await asyncio.sleep(self._consumer_wait_time)
@@ -99,27 +113,16 @@ class GCloudPubSubBackend(BroadcastBackend):
 
         return None
 
-    async def _pull_message_from_consumer(
-        self, pubsub_channel: str
-    ) -> PullResponse:
-        return await asyncio.get_running_loop().run_in_executor(
-            None,
-            functools.partial(
-                self._consumer.pull,
-                pubsub_channel,
-                max_messages=1,
-                return_immediately=True,
-            ),
+    def _pull_message_from_consumer(self, pubsub_channel: str) -> PullResponse:
+        return self._consumer.pull(
+            pubsub_channel, max_messages=1, return_immediately=True,
         )
 
     def _make_ack_future(
         self, message: ReceivedMessage, pubsub_channel: str
-    ) -> Awaitable[None]:
-        return asyncio.get_running_loop().run_in_executor(
-            None,
-            functools.partial(
-                self._consumer.acknowledge, pubsub_channel, [message.ack_id],
-            ),
+    ) -> FutureHint:
+        return self._executor.submit(
+            self._consumer.acknowledge, pubsub_channel, [message.ack_id],
         )
 
     async def wait_ack(
@@ -130,10 +133,8 @@ class GCloudPubSubBackend(BroadcastBackend):
     ) -> None:
         try:
             ack_future = self._make_ack_future(message, pubsub_channel)
-            await asyncio.wait_for(
-                ack_future, timeout=self._consumer_ack_timeout
-            )
-        except asyncio.TimeoutError:
+            ack_future.result(timeout=self._consumer_ack_timeout)
+        except FutureTimeoutError:
             if retries_counter >= self._consumer_ack_retries:
                 self._logger.exception(
                     f'ack timeout; {message.message.data.decode()[:100]}...'

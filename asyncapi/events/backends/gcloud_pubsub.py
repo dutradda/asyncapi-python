@@ -2,7 +2,7 @@ import asyncio
 import functools
 import itertools
 from collections import defaultdict
-from concurrent.futures import TimeoutError as FutureTimeoutError
+from concurrent.futures import TimeoutError as FutureTimeoutError, ThreadPoolExecutor
 from logging import Logger, getLogger
 from typing import TYPE_CHECKING, Any, DefaultDict, Dict, Optional, Set, Tuple
 from urllib.parse import urlparse
@@ -43,6 +43,7 @@ class GCloudPubSubBackend(BroadcastBackend):
             str, Set[AsyncFutureHint]
         ] = defaultdict(set)
         self._disconnected = True
+        self._executor = ThreadPoolExecutor(self._consumer_max_workers)
 
     async def connect(self) -> None:
         self._producer = pubsub_v1.PublisherClient()
@@ -135,29 +136,36 @@ class GCloudPubSubBackend(BroadcastBackend):
             channel_id, pubsub_channel = channels[channel_index]
             pull_message_future: AsyncFutureHint
             pull_message_future = asyncio.get_running_loop().run_in_executor(  # type: ignore
-                None,
+                self._executor,
                 functools.partial(
-                    self._consumer.pull, pubsub_channel, max_messages=1,
+                    self._consumer.pull, pubsub_channel,
+                    max_messages=1, return_immediately=True,
                 ),
             )
 
-            self._pull_message_futures[channel_id].add(pull_message_future)
+            # self._pull_message_futures[channel_id].add(pull_message_future)
 
             try:
                 response = await asyncio.wait_for(
                     pull_message_future, self._consumer_pull_message_timeout
                 )
-                self._pull_message_futures[channel_id].remove(
-                    pull_message_future
-                )
             except asyncio.TimeoutError:
-                self._pull_message_futures[channel_id].remove(
-                    pull_message_future
-                )
+                # self._pull_message_futures[channel_id].remove(
+                #     pull_message_future
+                # )
                 channel_index += 1
                 await asyncio.sleep(self._consumer_wait_time)
                 continue
             else:
+                # self._pull_message_futures[channel_id].remove(
+                #     pull_message_future
+                # )
+
+                if not response.received_messages:
+                    channel_index += 1
+                    await asyncio.sleep(self._consumer_wait_time)
+                    continue
+
                 return (
                     response.received_messages[0],
                     channel_id,
@@ -173,7 +181,7 @@ class GCloudPubSubBackend(BroadcastBackend):
         retries_counter: int = 1,
     ) -> None:
         future = asyncio.get_running_loop().run_in_executor(
-            None,
+            self._executor,
             functools.partial(
                 self._consumer.acknowledge, pubsub_channel, [message.ack_id],
             ),
@@ -200,9 +208,10 @@ class GCloudPubSubBackend(BroadcastBackend):
     def _set_consumer_config(self, bindings: Dict[str, str]) -> None:
         consumer_wait_time = 1.0
         consumer_ack_messages = False
-        consumer_ack_timeout = 5.0
+        consumer_ack_timeout = 1.0
         consumer_ack_retries = 3
-        consumer_pull_message_timeout = 0.5
+        consumer_pull_message_timeout = 1
+        consumer_max_workers = 10
         publish_timeout = 5.0
         publish_retries = 3
 
@@ -226,6 +235,9 @@ class GCloudPubSubBackend(BroadcastBackend):
             elif config_name == 'consumer_ack_retries':
                 consumer_ack_retries = int(config_value)
 
+            elif config_name == 'consumer_max_workers':
+                consumer_max_workers = int(config_value)
+
             elif config_name == 'consumer_pull_message_timeout':
                 consumer_pull_message_timeout = float(config_value)
 
@@ -240,5 +252,6 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._consumer_ack_timeout = consumer_ack_timeout
         self._consumer_ack_retries = consumer_ack_retries
         self._consumer_pull_message_timeout = consumer_pull_message_timeout
+        self._consumer_max_workers = consumer_max_workers
         self._publish_timeout = publish_timeout
         self._publish_retries = publish_retries

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.12.0 - 2020-10-02
 
  - Improve gcloud pubsub backend performance
 

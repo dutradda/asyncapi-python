@@ -25,7 +25,7 @@ class AsyncApi:
     spec: Specification
     operations: OperationsTypeHint
     events_handler: EventsHandler
-    republish_error_messages: bool = True
+    republish_error_messages: bool = False
     republish_error_messages_channels: Optional[Dict[str, str]] = None
     logger: logging.Logger = logging.getLogger(__name__)
 

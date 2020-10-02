@@ -149,8 +149,47 @@ def get_payload_examples(message: Any) -> List[Any]:
     return list(message.spec.get('examples', {}).values())
 
 
-def generate_example(schema: Any) -> Any:
-    return json.dumps(schema, indent=2)
+def generate_example(schema: Any, dumps_schema: bool = True) -> Any:
+    schema_type = schema.get('type')
+    schema_enum = schema.get('enum')
+    example: Any = {}
+
+    if schema_enum:
+        example = schema_enum[0]
+
+    elif schema_type == 'object' or schema_type is None:
+        for prop_name, prop_schema in schema.get('properties', {}).items():
+            example[prop_name] = generate_example(prop_schema, False)
+
+        for prop_name, prop_schema in schema.get(
+            'patternProperties', {}
+        ).items():
+            example[prop_name] = generate_example(prop_schema, False)
+
+    elif schema_type == 'array':
+        items_schema = schema.get('items', {})
+
+        if items_schema:
+            example = [generate_example(items_schema, False)]
+        else:
+            example = ['anyValue', {'any': 'value'}]
+
+    elif schema_type == 'string':
+        example = 'string value'
+
+    elif schema_type == 'integer':
+        example = 1
+
+    elif schema_type == 'number':
+        example = 0.1
+
+    elif schema_type == 'boolean':
+        example = True
+
+    if dumps_schema:
+        return json.dumps(example, indent=2)
+
+    return example
 
 
 def get_headers_examples(message: Any) -> List[Any]:

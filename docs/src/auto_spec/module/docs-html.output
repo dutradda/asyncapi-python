@@ -2,7 +2,7 @@ HTTP/1.1 200 OK
 date: ...
 server: uvicorn
 content-type: text/html; charset=utf-8
-content-length: 19520
+content-length: 19240
 
 <!DOCTYPE html>
 <html lang="en">
@@ -470,21 +470,9 @@ integer
       <div class="children payload-examples mt-4">
         
         <pre class="hljs mb-4 border border-grey-darkest rounded"><code>{
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "string"
-    },
-    "name": {
-      "type": "string"
-    },
-    "age": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "id"
-  ]
+  "id": "string value",
+  "name": "string value",
+  "age": 1
 }</code></pre>
         <h6 class="text-xs font-bold text-grey-darker italic">This example has been generated automatically.</h6>
         
@@ -815,21 +803,9 @@ integer
       <div class="children payload-examples mt-4">
         
         <pre class="hljs mb-4 border border-grey-darkest rounded"><code>{
-  "type": "object",
-  "properties": {
-    "id": {
-      "type": "string"
-    },
-    "name": {
-      "type": "string"
-    },
-    "age": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "id"
-  ]
+  "id": "string value",
+  "name": "string value",
+  "age": 1
 }</code></pre>
         <h6 class="text-xs font-bold text-grey-darker italic">This example has been generated automatically.</h6>
         

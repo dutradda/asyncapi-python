@@ -28,6 +28,7 @@ class AsyncApi:
     republish_error_messages: bool = True
     republish_error_messages_channels: Optional[Dict[str, str]] = None
     logger: logging.Logger = logging.getLogger(__name__)
+    operation_timeout: Optional[int] = None
 
     async def publish_json(
         self, channel_id: str, message: Dict[str, Any]
@@ -106,8 +107,20 @@ class AsyncApi:
                         payload, **getattr(event, 'context', {})
                     )
 
-                    while asyncio.iscoroutine(coro):
-                        coro = await coro
+                    if self.operation_timeout:
+                        try:
+                            while asyncio.iscoroutine(coro):
+                                coro = await asyncio.wait_for(
+                                    coro, timeout=self.operation_timeout
+                                )
+                        except asyncio.TimeoutError:
+                            self.logger.exception(
+                                f'operation timeout: {self.operation_timeout}; '
+                                f'message={event.message[:100]}'
+                            )
+                    else:
+                        while asyncio.iscoroutine(coro):
+                            coro = await coro
 
                 except (orjson.JSONDecodeError, DeserializationError):
                     self.logger.exception(f"message={event.message[:100]}")

@@ -102,11 +102,10 @@ class GCloudPubSubBackend(BroadcastBackend):
 
     async def next_published(self) -> Optional[Event]:
         (
-            response,
+            received_message,
             channel_id,
             pubsub_channel,
         ) = await self._pull_message_from_consumer()
-        received_message = response.received_messages[0]
         event = Event(channel_id, received_message.message.data.decode())
 
         if self._consumer_ack_messages:
@@ -120,20 +119,20 @@ class GCloudPubSubBackend(BroadcastBackend):
 
     async def _pull_message_from_consumer(
         self,
-    ) -> Tuple[PullResponse, str, str]:
-        channels = list(self._consumer_channels.items())
+    ) -> Tuple[ReceivedMessage, str, str]:
         channel_index = 0
 
         while not self._disconnected:
-            if channel_index >= len(channels):
-                channel_index = 0
+            channels = list(self._consumer_channels.items())
 
-            try:
-                channel_id, pubsub_channel = channels[channel_index]
-            except IndexError:
+            if not len(channels):
                 await asyncio.sleep(self._consumer_wait_time)
                 continue
 
+            if channel_index >= len(channels):
+                channel_index = 0
+
+            channel_id, pubsub_channel = channels[channel_index]
             pull_message_future: AsyncFutureHint
             pull_message_future = asyncio.get_running_loop().run_in_executor(  # type: ignore
                 None,
@@ -159,7 +158,11 @@ class GCloudPubSubBackend(BroadcastBackend):
                 await asyncio.sleep(self._consumer_wait_time)
                 continue
             else:
-                return response, channel_id, pubsub_channel
+                return (
+                    response.received_messages[0],
+                    channel_id,
+                    pubsub_channel,
+                )
 
         raise GCloudPubSubConsumerDisconnectError()
 

@@ -45,10 +45,11 @@ class AsyncApi:
             message=self.parse_message(channel_id, message).decode(),
         )
 
-    async def connect(self) -> None:
+    async def __aenter__(self) -> EventsHandler:
         await self.events_handler.connect()
+        return self
 
-    async def disconnect(self) -> None:
+    async def __aexit__(self, *args, **kwargs) -> None:
         await self.events_handler.disconnect()
 
     def payload(self, channel_id: str, **message: Any) -> Any:

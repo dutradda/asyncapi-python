@@ -100,7 +100,7 @@ class GCloudPubSubBackend(BroadcastBackend):
 
             channel_id, pubsub_channel = channels[channel_index]
 
-            response = self._pull_message_from_consumer(pubsub_channel)
+            response = await self._pull_message_from_consumer(pubsub_channel)
 
             if response is None or not response.received_messages:
                 await asyncio.sleep(self._consumer_wait_time)
@@ -127,19 +127,24 @@ class GCloudPubSubBackend(BroadcastBackend):
 
         return None
 
-    def _pull_message_from_consumer(
+    async def _pull_message_from_consumer(
         self, pubsub_channel: str, retries_counter: int = 1,
     ) -> Optional[PullResponse]:
-        future = self._executor.submit(
-            self._consumer.pull,
-            pubsub_channel,
-            max_messages=1,
-            return_immediately=True,
+        future = asyncio.get_running_loop().run_in_executor(
+            None,
+            functools.partial(
+                self._consumer.pull,
+                pubsub_channel,
+                max_messages=1,
+                return_immediately=True,
+            ),
         )
 
         try:
-            return future.result(timeout=self._consumer_pull_message_timeout)
-        except FutureTimeoutError:
+            return await asyncio.wait_for(
+                future, timeout=self._consumer_pull_message_timeout
+            )
+        except asyncio.TimeoutError:
             if retries_counter >= self._consumer_pull_message_retries:
                 self._logger.warning(
                     f'pull message timeout {self._consumer_pull_message_timeout}; '
@@ -147,7 +152,7 @@ class GCloudPubSubBackend(BroadcastBackend):
                 )
                 return None
             else:
-                return self._pull_message_from_consumer(
+                return await self._pull_message_from_consumer(
                     pubsub_channel, retries_counter + 1
                 )
 
@@ -157,13 +162,16 @@ class GCloudPubSubBackend(BroadcastBackend):
         pubsub_channel: str,
         retries_counter: int = 1,
     ) -> None:
-        future = self._executor.submit(
-            self._consumer.acknowledge, pubsub_channel, [message.ack_id],
+        future = asyncio.get_running_loop().run_in_executor(
+            None,
+            functools.partial(
+                self._consumer.acknowledge, pubsub_channel, [message.ack_id],
+            ),
         )
 
         try:
-            future.result(timeout=self._consumer_ack_timeout)
-        except FutureTimeoutError:
+            await asyncio.wait_for(future, timeout=self._consumer_ack_timeout)
+        except asyncio.TimeoutError:
             if retries_counter >= self._consumer_ack_retries:
                 self._logger.warning(
                     f'ack timeout {self._consumer_ack_timeout}; '

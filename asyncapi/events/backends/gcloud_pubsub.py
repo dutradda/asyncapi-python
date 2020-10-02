@@ -141,7 +141,7 @@ class GCloudPubSubBackend(BroadcastBackend):
             return future.result(timeout=self._consumer_pull_message_timeout)
         except FutureTimeoutError:
             if retries_counter >= self._consumer_pull_message_retries:
-                self._logger.exception(
+                self._logger.warning(
                     f'pull message timeout {self._consumer_pull_message_timeout}; '
                     f'channel={pubsub_channel}'
                 )
@@ -165,8 +165,9 @@ class GCloudPubSubBackend(BroadcastBackend):
             future.result(timeout=self._consumer_ack_timeout)
         except FutureTimeoutError:
             if retries_counter >= self._consumer_ack_retries:
-                self._logger.exception(
-                    f'ack timeout; {message.message.data.decode()[:100]}...'
+                self._logger.warning(
+                    f'ack timeout {self._consumer_ack_timeout}; '
+                    f'message={message.message.data.decode()[:100]}...'
                 )
             else:
                 await self.wait_ack(

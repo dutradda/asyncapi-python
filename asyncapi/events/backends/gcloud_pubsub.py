@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import secrets
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeoutError
 from logging import Logger, getLogger
@@ -106,7 +107,11 @@ class GCloudPubSubBackend(BroadcastBackend):
     async def _pull_message_from_consumer(
         self,
     ) -> Tuple[ReceivedMessage, str, str]:
-        channel_index = 0
+        channel_index = (
+            secrets.choice(range(len(self._consumer_channels)))
+            if self._consumer_channels
+            else 0
+        )
 
         while not self._disconnected:
             channels = list(self._consumer_channels.items())
@@ -146,6 +151,7 @@ class GCloudPubSubBackend(BroadcastBackend):
                     await asyncio.sleep(self._consumer_wait_time)
                     continue
 
+                await asyncio.sleep(self._pull_message_wait_time)
                 return (
                     response.received_messages[0],
                     channel_id,
@@ -194,6 +200,7 @@ class GCloudPubSubBackend(BroadcastBackend):
         consumer_max_workers = 10
         publish_timeout = 5.0
         publish_retries = 3
+        pull_message_wait_time = 0.1
 
         for config_name, config_value in bindings.items():
             if config_name == 'consumer_wait_time':
@@ -227,6 +234,9 @@ class GCloudPubSubBackend(BroadcastBackend):
             elif config_name == 'publish_retries':
                 publish_retries = int(config_value)
 
+            elif config_name == 'pull_message_wait_time':
+                pull_message_wait_time = float(config_value)
+
         self._consumer_wait_time = consumer_wait_time
         self._consumer_ack_messages = consumer_ack_messages
         self._consumer_ack_timeout = consumer_ack_timeout
@@ -235,3 +245,4 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._consumer_max_workers = consumer_max_workers
         self._publish_timeout = publish_timeout
         self._publish_retries = publish_retries
+        self._pull_message_wait_time = pull_message_wait_time

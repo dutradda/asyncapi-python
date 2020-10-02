@@ -62,5 +62,9 @@ class ChannelPublishNotFoundError(AsyncApiError):
     ...
 
 
-class PublishTimeoutError(AsyncApiError):
+class GCloudPubSubPublishTimeoutError(AsyncApiError):
+    ...
+
+
+class GCloudPubSubConsumerDisconnectError(AsyncApiError):
     ...

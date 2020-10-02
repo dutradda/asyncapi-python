@@ -16,9 +16,10 @@ from .events import Event
 from .events.handler import EventsHandler
 from .exceptions import (
     ChannelOperationNotFoundError,
+    GCloudPubSubConsumerDisconnectError,
+    GCloudPubSubPublishTimeoutError,
     InvalidChannelError,
     OperationIdNotFoundError,
-    PublishTimeoutError,
     ReferenceNotFoundError,
     UrlOrModuleRequiredError,
 )
@@ -66,5 +67,6 @@ __all__ = [
     'run_docs',
     'EventsHandler',
     'Event',
-    'PublishTimeoutError',
+    'GCloudPubSubPublishTimeoutError',
+    'GCloudPubSubConsumerDisconnectError',
 ]

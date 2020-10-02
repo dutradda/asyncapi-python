@@ -18,6 +18,7 @@ from .exceptions import (
     ChannelOperationNotFoundError,
     InvalidChannelError,
     OperationIdNotFoundError,
+    PublishTimeoutError,
     ReferenceNotFoundError,
     UrlOrModuleRequiredError,
 )
@@ -65,4 +66,5 @@ __all__ = [
     'run_docs',
     'EventsHandler',
     'Event',
+    'PublishTimeoutError',
 ]

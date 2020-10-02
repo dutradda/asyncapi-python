@@ -10,6 +10,8 @@ from broadcaster._backends.base import BroadcastBackend
 from google.cloud import pubsub_v1
 from google.cloud.pubsub_v1.types import PullResponse, ReceivedMessage
 
+from asyncapi import PublishTimeoutError
+
 from .. import Event
 
 
@@ -37,7 +39,7 @@ class GCloudPubSubBackend(BroadcastBackend):
         self._set_consumer_config(bindings)
 
         if executor is None:
-            executor = ThreadPoolExecutor()
+            executor = ThreadPoolExecutor(self._consumer_max_workers)
 
         self._executor = executor
 
@@ -62,7 +64,9 @@ class GCloudPubSubBackend(BroadcastBackend):
     async def unsubscribe(self, channel: str) -> None:
         self._consumer_channels.pop(channel)
 
-    async def publish(self, channel: str, message: Any) -> None:
+    async def publish(
+        self, channel: str, message: Any, retries_counter: int = 1
+    ) -> None:
         producer_channel = self._producer_channels.get(channel)
 
         if not producer_channel:
@@ -72,7 +76,17 @@ class GCloudPubSubBackend(BroadcastBackend):
             self._producer_channels[channel] = producer_channel
 
         future = self._producer.publish(producer_channel, message.encode())
-        future.result()
+
+        try:
+            future.result(timeout=self._publish_timeout)
+        except FutureTimeoutError:
+            if retries_counter >= self._publish_retries:
+                raise PublishTimeoutError(
+                    f'publish timeout; channel={channel}; '
+                    f'message={message[:100]}...'
+                )
+            else:
+                await self.publish(channel, message, retries_counter + 1)
 
     async def next_published(self) -> Optional[Event]:
         channel_index = self._channel_index
@@ -149,6 +163,9 @@ class GCloudPubSubBackend(BroadcastBackend):
         consumer_ack_messages = False
         consumer_ack_timeout = 5.0
         consumer_ack_retries = 3
+        consumer_max_workers = 10
+        publish_timeout = 5.0
+        publish_retries = 3
 
         for config_name, config_value in bindings.items():
             if config_name == 'consumer_wait_time':
@@ -170,7 +187,19 @@ class GCloudPubSubBackend(BroadcastBackend):
             elif config_name == 'consumer_ack_retries':
                 consumer_ack_retries = int(config_value)
 
+            elif config_name == 'consumer_max_workers':
+                consumer_max_workers = int(config_value)
+
+            elif config_name == 'publish_timeout':
+                publish_timeout = int(config_value)
+
+            elif config_name == 'publish_retries':
+                publish_retries = int(config_value)
+
         self._consumer_wait_time = consumer_wait_time
         self._consumer_ack_messages = consumer_ack_messages
         self._consumer_ack_timeout = consumer_ack_timeout
         self._consumer_ack_retries = consumer_ack_retries
+        self._consumer_max_workers = consumer_max_workers
+        self._publish_timeout = publish_timeout
+        self._publish_retries = publish_retries

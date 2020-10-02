@@ -60,3 +60,7 @@ class InvalidChannelsSubscribersError(AsyncApiError):
 
 class ChannelPublishNotFoundError(AsyncApiError):
     ...
+
+
+class PublishTimeoutError(AsyncApiError):
+    ...

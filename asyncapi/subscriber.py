@@ -69,12 +69,11 @@ def start(
     loop: AbstractEventLoop, api: AsyncApi, channel: Optional[str]
 ) -> None:
     async def init() -> None:
-        await api.connect()
-
-        if channel is None:
-            await api.listen_all()
-        else:
-            await api.listen(channel)
+        async with api as api_:
+            if channel is None:
+                await api_.listen_all()
+            else:
+                await api_.listen(channel)
 
     task = loop.create_task(init())
     task.add_done_callback(task_callback)

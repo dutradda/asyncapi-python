@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Improve gcloud pubsub backend performance
+
 ### 0.11.1 - 2020-09-29
 
  - Improve custom logging

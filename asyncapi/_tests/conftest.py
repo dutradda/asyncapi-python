@@ -92,6 +92,7 @@ def fake_events_handler(
     events_handler = fake_events_handler_cls.return_value
     events_handler.publish = asynctest.CoroutineMock()
     events_handler.connect = asynctest.CoroutineMock()
+    events_handler.disconnect = asynctest.CoroutineMock()
     events_handler.subscribe.return_value = async_iterator(
         [mocker.MagicMock(message=json_message)]
     )

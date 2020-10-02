@@ -25,7 +25,7 @@ class AsyncApi:
     spec: Specification
     operations: OperationsTypeHint
     events_handler: EventsHandler
-    republish_error_messages: bool = True
+    republish_error_messages: bool = False
     republish_error_messages_channels: Optional[Dict[str, str]] = None
     logger: logging.Logger = logging.getLogger(__name__)
     operation_timeout: Optional[int] = None
@@ -45,6 +45,13 @@ class AsyncApi:
             channel=channel_id,
             message=self.parse_message(channel_id, message).decode(),
         )
+
+    async def __aenter__(self) -> 'AsyncApi':
+        await self.connect()
+        return self
+
+    async def __aexit__(self, *args: Any, **kwargs: Any) -> None:
+        await self.disconnect()
 
     async def connect(self) -> None:
         await self.events_handler.connect()

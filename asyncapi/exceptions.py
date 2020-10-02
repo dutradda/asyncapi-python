@@ -60,3 +60,11 @@ class InvalidChannelsSubscribersError(AsyncApiError):
 
 class ChannelPublishNotFoundError(AsyncApiError):
     ...
+
+
+class GCloudPubSubPublishTimeoutError(AsyncApiError):
+    ...
+
+
+class GCloudPubSubConsumerDisconnectError(AsyncApiError):
+    ...

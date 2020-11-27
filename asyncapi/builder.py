@@ -4,7 +4,7 @@ asyncapi
 import importlib
 import io
 from collections import defaultdict, deque
-from typing import Any, DefaultDict, Dict, Optional
+from typing import Any, DefaultDict, Dict, List, Optional
 
 import requests
 import yaml
@@ -23,6 +23,7 @@ from .exceptions import (
     ServerNotFoundError,
 )
 from .specification_v2_0_0 import (
+    ASYNCAPI_PYTHON_VERSION,
     ASYNCAPI_VERSION,
     DEFAULT_CONTENT_TYPE,
     Channel,
@@ -33,6 +34,7 @@ from .specification_v2_0_0 import (
     ProtocolType,
     Server,
     Specification,
+    Tag,
 )
 
 
@@ -301,6 +303,7 @@ def build_spec(spec: Dict[str, Any]) -> Specification:
         else None,
         channels=build_channels(spec),
         components=build_components(spec.get('components')),
+        tags=build_tags(spec.get('tags')),
     )
 
 
@@ -350,20 +353,29 @@ def validate_content_type(content_type: str) -> None:
 
 
 def validate_asyncapi_version(asyncapi_version: str) -> None:
-    if asyncapi_version != ASYNCAPI_VERSION:
+    if asyncapi_version not in (ASYNCAPI_VERSION, ASYNCAPI_PYTHON_VERSION):
         raise InvalidAsyncApiVersionError(
-            asyncapi_version, f'valid versions: {ASYNCAPI_VERSION}'
+            asyncapi_version,
+            (
+                f'valid versions: {ASYNCAPI_VERSION}, '
+                f'{ASYNCAPI_PYTHON_VERSION}',
+            ),
         )
 
 
 def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
     channels = {}
+    messages = spec.get('components', {}).get('messages', {})
 
     for channel_name, channel_spec in spec['channels'].items():
         channels[channel_name] = Channel(
             name=channel_name,
-            subscribe=build_operation(channel_spec.pop('subscribe', None)),
-            publish=build_operation(channel_spec.pop('publish', None)),
+            subscribe=build_operation(
+                channel_spec.pop('subscribe', None), messages
+            ),
+            publish=build_operation(
+                channel_spec.pop('publish', None), messages
+            ),
             **channel_spec,
         )
 
@@ -371,16 +383,23 @@ def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
 
 
 def build_operation(
-    operation_spec: Optional[Dict[str, Any]]
+    operation_spec: Optional[Dict[str, Any]], messages: Dict[str, Any],
 ) -> Optional[Operation]:
     if operation_spec is None:
         return None
 
     message_spec = operation_spec.get('message')
 
+    if 'name' not in message_spec:  # type: ignore
+        for message_name, message_payload in messages.items():
+            if message_payload == message_spec:
+                message_spec['name'] = message_name
+                break
+
     return Operation(
         message=build_message(message_spec) if message_spec else None,
-        operation_id=operation_spec.get('operationId', None),
+        operation_id=operation_spec.get('operationId'),
+        tags=build_tags(operation_spec.get('tags')),
     )
 
 
@@ -419,6 +438,15 @@ def build_components(
         else None,
         schemas=components_spec.get('schemas'),
     )
+
+
+def build_tags(
+    tags_spec: Optional[List[Dict[str, Any]]]
+) -> Optional[List[Tag]]:
+    if tags_spec:
+        return [Tag(**tag_spec) for tag_spec in tags_spec]
+
+    return None
 
 
 def fill_refs(

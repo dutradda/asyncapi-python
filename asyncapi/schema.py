@@ -2,7 +2,6 @@ from typing import (
     Any,
     Dict,
     Iterable,
-    List,
     Sequence,
     Type,
     Union,
@@ -19,13 +18,18 @@ def type_as_jsonschema(python_type: Type[Any]) -> Dict[str, Any]:
     schema_type = SCALARS.get(python_type)
 
     if schema_type is None:
-        origin = getattr(python_type, '__origin__', None)
+        origin = get_origin(python_type)
 
-        if origin is List or origin is Sequence or origin is Iterable:
-            return {
+        if origin is list or origin is Sequence or origin is Iterable:
+            schema = {
                 'type': 'array',
                 'items': type_as_jsonschema(python_type.__args__[0]),
             }
+
+            if hasattr(python_type.__args__[0], '__additional_items__'):
+                schema['additionalItems'] = python_type.__additional_items__
+
+            return schema
 
         return build_object_schema(python_type)
 
@@ -62,6 +66,9 @@ def build_object_schema(python_type: Type[Any]) -> Dict[str, Any]:
 
     if required:
         schema['required'] = required
+
+    if hasattr(python_type, '__additional_properties__'):
+        schema['additionalProperties'] = python_type.__additional_properties__
 
     return schema
 

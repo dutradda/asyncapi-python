@@ -27,7 +27,8 @@ coverage: //check-virtualenv
         docs/src/gcloud_pubsub/.coverage.* \
         docs/src/gcloud_pubsub/http_spec/.coverage.* \
         docs/src/gcloud_pubsub/python_spec/.coverage.* \
-        docs/src/gcloud_pubsub/server_bindings/.coverage.*
+        docs/src/gcloud_pubsub/server_bindings/.coverage.* \
+        docs/src/html_spec/.coverage.*
     coverage report
     coverage xml
 
@@ -70,8 +71,11 @@ tests-docs-pubsub-python-spec:
 tests-docs-pubsub-server-bindings:
     bats docs/src/gcloud_pubsub/server_bindings
 
-tests-docs: tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+tests-docs-html-spec:
+    bats docs/src/html_spec
 
-tests: tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings
+tests-docs: tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings tests-docs-html-spec
 
-integration: check-code tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings coverage
+tests: tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings tests-docs-html-spec
+
+integration: check-code tests-code tests-docs-index-yaml-spec tests-docs-index-python-spec tests-docs-auto-spec-module tests-docs-auto-spec-decorator tests-docs-expose-docs tests-docs-pubsub-http-spec tests-docs-pubsub-python-spec tests-docs-pubsub-server-bindings tests-docs-html-spec coverage

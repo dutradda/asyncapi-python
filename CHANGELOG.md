@@ -1,5 +1,13 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Create 2.1.0 extended version os asyncapi
+
+ - Fix docs requirements
+
+ - Improve specification parsing
+
 ### 0.12.0 - 2020-10-02
 
  - Improve gcloud pubsub backend performance

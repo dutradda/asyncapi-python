@@ -365,12 +365,17 @@ def validate_asyncapi_version(asyncapi_version: str) -> None:
 
 def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
     channels = {}
+    messages = spec.get('components', {}).get('messages', {})
 
     for channel_name, channel_spec in spec['channels'].items():
         channels[channel_name] = Channel(
             name=channel_name,
-            subscribe=build_operation(channel_spec.pop('subscribe', None)),
-            publish=build_operation(channel_spec.pop('publish', None)),
+            subscribe=build_operation(
+                channel_spec.pop('subscribe', None), messages
+            ),
+            publish=build_operation(
+                channel_spec.pop('publish', None), messages
+            ),
             **channel_spec,
         )
 
@@ -378,12 +383,18 @@ def build_channels(spec: Dict[str, Any]) -> Dict[str, Channel]:
 
 
 def build_operation(
-    operation_spec: Optional[Dict[str, Any]]
+    operation_spec: Optional[Dict[str, Any]], messages: Dict[str, Any],
 ) -> Optional[Operation]:
     if operation_spec is None:
         return None
 
     message_spec = operation_spec.get('message')
+
+    if 'name' not in message_spec:  # type: ignore
+        for message_name, message_payload in messages.items():
+            if message_payload == message_spec:
+                message_spec['name'] = message_name
+                break
 
     return Operation(
         message=build_message(message_spec) if message_spec else None,

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.13.1 - 2020-11-27
 
  - Fix docs requirements
 

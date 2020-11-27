@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, get_type_hints
 
 DEFAULT_CONTENT_TYPE = 'application/json'
 ASYNCAPI_VERSION = '2.0.0'
+ASYNCAPI_PYTHON_VERSION = '2.1.0'
 
 
 @dataclass

@@ -23,6 +23,7 @@ from .exceptions import (
     ServerNotFoundError,
 )
 from .specification_v2_0_0 import (
+    ASYNCAPI_PYTHON_VERSION,
     ASYNCAPI_VERSION,
     DEFAULT_CONTENT_TYPE,
     Channel,
@@ -352,9 +353,13 @@ def validate_content_type(content_type: str) -> None:
 
 
 def validate_asyncapi_version(asyncapi_version: str) -> None:
-    if asyncapi_version != ASYNCAPI_VERSION:
+    if asyncapi_version not in (ASYNCAPI_VERSION, ASYNCAPI_PYTHON_VERSION):
         raise InvalidAsyncApiVersionError(
-            asyncapi_version, f'valid versions: {ASYNCAPI_VERSION}'
+            asyncapi_version,
+            (
+                f'valid versions: {ASYNCAPI_VERSION}, '
+                f'{ASYNCAPI_PYTHON_VERSION}',
+            ),
         )
 
 

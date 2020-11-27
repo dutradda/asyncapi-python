@@ -65,6 +65,7 @@ subscriber = [
 docs = [
     'apidaora',
     'jinja2',
+    'markdown',
     'uvicorn'
 ]
 gcloud-pubsub = [

@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Fix docs requirements
+
 ### 0.13.0 - 2020-11-27
 
  - Create 2.1.0 extended version os asyncapi

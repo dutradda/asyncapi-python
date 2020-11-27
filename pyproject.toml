@@ -65,6 +65,7 @@ subscriber = [
 docs = [
     'apidaora',
     'jinja2',
+    'uvicorn'
 ]
 gcloud-pubsub = [
     'google-cloud-pubsub>=1,<2'

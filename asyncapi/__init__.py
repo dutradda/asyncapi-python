@@ -2,7 +2,7 @@
 asyncapi
 """
 
-__version__ = '0.13.1'
+__version__ = '0.14.0'
 from .api import AsyncApi, OperationsTypeHint
 from .builder import (
     build_api,

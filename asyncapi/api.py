@@ -4,7 +4,12 @@ import logging
 from typing import Any, Callable, Dict, Optional, Tuple, Type
 
 import orjson
-from jsondaora import DeserializationError, asdataclass, dataclass_asjson
+from jsondaora import (
+    DeserializationError,
+    asdataclass,
+    dataclass_asjson,
+    typed_dict_asjson,
+)
 
 from .events.handler import EventsHandler
 from .exceptions import (
@@ -181,6 +186,9 @@ class AsyncApi:
         type_ = self.publish_payload_type(channel_id)
 
         if type_:
+            if issubclass(type_, dict):
+                return typed_dict_asjson(message, type_)
+
             if not isinstance(message, type_):
                 raise InvalidMessageError(message, type_)
 

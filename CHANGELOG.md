@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Add support for TypedDict event payload
+
 ### 0.13.1 - 2020-11-27
 
  - Fix docs requirements

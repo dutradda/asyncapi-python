@@ -46,6 +46,9 @@ class AsyncApi:
         )
 
     async def publish(self, channel_id: str, message: Any) -> None:
+        if isinstance(message, dict):
+            return await self.publish_json(channel_id, message)
+
         await self.events_handler.publish(
             channel=channel_id,
             message=self.parse_message(channel_id, message).decode(),

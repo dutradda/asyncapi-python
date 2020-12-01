@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+### UNRELEASED
+
+ - Improve AsyncApi.publish method to accept dicts
+
 ### 0.14.0 - 2020-12-01
 
  - Add support for TypedDict event payload

@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-### UNRELEASED
+### 0.14.1 - 2020-12-01
 
  - Improve AsyncApi.publish method to accept dicts
 
